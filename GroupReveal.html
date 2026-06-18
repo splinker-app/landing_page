@@ -1,0 +1,282 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Splinker — Group Reveal</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@500;600;700;800&family=Barlow+Condensed:wght@500;700;800&family=Barlow+Semi+Condensed:wght@500;600;700;800&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#FAF7F0; --surface:#FFFFFF; --surface2:#ECE6D7; --line:#E0D6C1;
+    --ink:#14110E; --ink2:#3A332C; --ink3:#7A6F60;
+    --brand:#EE4A23; --brandInk:#FFFFFF; --accent:#C6F24E;
+    --display:'Barlow Condensed'; --semi:'Barlow Semi Condensed'; --barlow:'Barlow'; --inter:'Inter';
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:#3a352e;font-family:var(--barlow);display:flex;justify-content:center;align-items:flex-start;min-height:100vh;padding:40px 16px}
+
+  .device{width:390px;height:844px;border-radius:54px;background:#0c0907;padding:5px;box-shadow:0 40px 80px rgba(0,0,0,0.5);position:relative}
+  .screen{width:100%;height:100%;border-radius:49px;background:var(--bg);overflow:hidden;position:relative}
+  .notch{position:absolute;top:10px;left:50%;transform:translateX(-50%);width:120px;height:30px;background:#0c0907;border-radius:18px;z-index:30}
+  .statusbar{position:absolute;top:0;left:0;right:0;height:50px;display:flex;align-items:flex-end;justify-content:space-between;padding:0 28px 6px;font-size:14px;font-weight:600;color:var(--ink);z-index:25;font-family:-apple-system,var(--inter)}
+  .topBtn{position:absolute;top:54px;left:16px;width:40px;height:40px;border-radius:999px;background:var(--surface);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;z-index:20}
+  .topBtn svg{width:20px;height:20px;color:var(--ink)}
+  .topFade{position:absolute;top:0;left:0;right:0;height:104px;background:linear-gradient(var(--bg),rgba(250,247,240,0));z-index:15;pointer-events:none}
+
+  .scroll{position:absolute;inset:0;overflow-y:auto;overflow-x:hidden}
+  .scroll::-webkit-scrollbar{display:none}
+  .scrollContent{padding-top:94px;padding-bottom:150px}
+
+  /* hero ticket */
+  .hero{margin:14px 16px 16px;border-radius:28px;background:var(--ink);overflow:hidden}
+  .heroBody{padding:22px 22px 18px}
+  .heroEventTitle{font-family:var(--display);font-weight:800;font-size:32px;letter-spacing:-0.64px;line-height:32px;text-transform:uppercase;color:var(--bg);margin-bottom:14px}
+  .anticipationRow{display:flex;align-items:center;padding-top:14px;border-top:1px solid rgba(255,255,255,0.15)}
+  .anticipationCol{flex:1}
+  .anticipationEyebrow{font-family:var(--barlow);font-weight:700;font-size:11px;letter-spacing:1.4px;text-transform:uppercase;color:var(--bg);opacity:0.5}
+  .heroAvatarRow{display:flex;align-items:center;margin-top:8px}
+  .heroAvatarRow .av{width:36px;height:36px;border-radius:999px;border:2px solid var(--ink);margin-left:-10px}
+  .heroAvatarRow .av:first-child{margin-left:0}
+  .anticipationDivider{width:1px;height:38px;background:rgba(255,255,255,0.15);margin:0 14px}
+  .anticipationCountdown{font-family:var(--display);font-weight:800;font-size:28px;letter-spacing:-0.56px;text-transform:uppercase;color:var(--bg);margin-top:6px}
+
+  /* group at a glance */
+  .glance{margin:0 16px 18px;padding:14px 16px;border-radius:18px;background:var(--surface);border:1px solid var(--line)}
+  .glanceCellsRow{display:flex;align-items:stretch}
+  .glanceCell{flex:1;padding:0 6px}
+  .glanceVDivider{width:1px;background:var(--line);margin:0 4px}
+  .glanceHDivider{height:1px;background:var(--line);margin:14px 0}
+  .glanceTileLabel{font-family:var(--barlow);font-weight:700;font-size:11px;letter-spacing:1.4px;text-transform:uppercase;color:var(--ink3);margin-bottom:6px}
+  .glanceTileValue{font-family:var(--display);font-weight:800;font-size:28px;letter-spacing:-0.56px;line-height:28px;color:var(--ink)}
+  .sportChipRow{display:flex;flex-wrap:wrap;gap:8px;margin-top:4px}
+  .sportChip{display:flex;align-items:center;gap:6px;padding:5px 10px;border-radius:10px;border:1.5px solid}
+  .sportChip.all{background:var(--accent);border-color:var(--accent)}
+  .sportChip.some{background:var(--surface);border-color:var(--line)}
+  .sportChipEmoji{font-size:14px;line-height:1}
+  .sportChipText{font-family:var(--barlow);font-weight:600;font-size:14px;letter-spacing:-0.28px}
+  .sportChip.all .sportChipText{color:var(--ink)}
+  .sportChip.some .sportChipText{color:var(--ink2)}
+  .sportChipBadge{padding:1px 6px;border-radius:999px;margin-left:2px;display:inline-flex;align-items:center}
+  .sportChip.all .sportChipBadge{background:rgba(20,17,14,0.18)}
+  .sportChip.some .sportChipBadge{background:var(--surface2)}
+  .sportChipBadgeText{font-family:var(--barlow);font-weight:700;font-size:10px;letter-spacing:0.6px;text-transform:uppercase;line-height:1}
+  .sportChip.all .sportChipBadgeText{color:var(--ink)}
+  .sportChip.some .sportChipBadgeText{color:var(--ink3)}
+
+  /* section header */
+  .sectionHeader{padding:0 24px 10px;display:flex;justify-content:space-between;align-items:baseline}
+  .sectionTitle{font-family:var(--display);font-weight:800;font-size:22px;letter-spacing:-0.44px;text-transform:uppercase;color:var(--ink)}
+  .postBtn{display:inline-flex;align-items:center;padding:6px 12px;border-radius:999px;background:var(--brand)}
+  .postBtnText{font-family:var(--barlow);font-weight:700;font-size:11px;letter-spacing:1.1px;text-transform:uppercase;color:var(--brandInk);line-height:1}
+
+  /* group thread */
+  .chatCard{margin:0 16px 18px;padding:12px 14px;border-radius:18px;background:var(--surface);border:1px solid var(--line)}
+  .chatRow{display:flex;align-items:flex-start;gap:10px;padding:8px 0}
+  .chatRow + .chatRow{border-top:1px solid var(--line)}
+  .chatRow.me{flex-direction:row-reverse}
+  .chatAv{width:28px;height:28px;border-radius:999px;border:2px solid var(--surface);flex-shrink:0}
+  .chatMain{flex:1;min-width:0;display:flex;flex-direction:column}
+  .chatRow.me .chatMain{align-items:flex-end}
+  .chatHeader{display:flex;align-items:baseline;gap:6px}
+  .chatAuthor{font-family:var(--barlow);font-weight:700;font-size:14px;color:var(--ink)}
+  .chatTimestamp{font-family:var(--barlow);font-weight:600;font-size:11px;color:var(--ink3)}
+  .threadReactionPill{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:8px;background:var(--surface2);border:1px solid var(--line);margin-top:4px}
+  .reactionPill{display:block;height:23px;width:auto;margin-top:4px;align-self:flex-start;flex:none}
+  .chatRow.me .reactionPill{align-self:flex-end}
+  .threadReactionEmoji{font-size:13px;line-height:15px}
+  .threadReactionLabel{font-family:var(--barlow);font-weight:600;font-size:12px;letter-spacing:0.2px;color:var(--ink2)}
+  .chatBody{font-family:var(--barlow);font-weight:500;font-size:15px;line-height:20px;color:var(--ink2);margin-top:3px}
+
+  /* lineup */
+  .lineupNote{font-family:var(--barlow);font-weight:500;font-size:13px;line-height:18px;color:var(--ink3);padding:0 24px;margin-top:-2px;margin-bottom:12px}
+  .lineup{padding:0 16px;margin-bottom:18px}
+  .memberRow{display:flex;align-items:flex-start;gap:14px;padding:14px;margin-bottom:10px;border-radius:18px}
+  .memberRow.neutral{background:var(--surface);border:1px solid var(--line)}
+  .memberRow.me{background:var(--brand)}
+  .avatarWrap{position:relative;width:56px;height:56px;flex-shrink:0}
+  .avatar{width:56px;height:56px;border-radius:999px;border:2.5px solid var(--surface2)}
+  .memberRow.me .avatar{border-color:var(--brandInk)}
+  .avatarScrim{position:absolute;inset:0;border-radius:999px;background:rgba(250,247,240,0.92);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+  .memberMain{flex:1;min-width:0}
+  .nameRow{display:flex;align-items:baseline;gap:6px;margin-bottom:2px;flex-wrap:wrap}
+  .memberName{font-family:var(--display);font-weight:800;font-size:20px;letter-spacing:-0.4px;line-height:20px;text-transform:uppercase;color:var(--ink)}
+  .memberRow.me .memberName{color:var(--brandInk)}
+  .memberAge{font-family:var(--barlow);font-weight:500;font-size:13px;color:var(--ink);opacity:0.65}
+  .memberRow.me .memberAge{color:var(--brandInk);opacity:0.85}
+  .memberYouBadge{font-family:var(--barlow);font-weight:700;font-size:10px;letter-spacing:0.8px;text-transform:uppercase;color:var(--brandInk);opacity:0.7}
+  .moodChip{display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:8px;border:1px solid;margin-top:6px}
+  .moodChip.neutral{background:var(--surface);border-color:var(--line)}
+  .moodChip.me{background:rgba(255,255,255,0.18);border-color:rgba(255,255,255,0.35)}
+  .moodChipEmoji{font-size:11px;line-height:13px}
+  .moodChipLabel{font-family:var(--barlow);font-weight:600;font-size:12px;letter-spacing:-0.24px;color:var(--ink2);line-height:1}
+  .moodChip.me .moodChipLabel{color:var(--brandInk)}
+  .memberRight{display:flex;flex-direction:column;align-items:flex-end;gap:8px;flex-shrink:0}
+  .statusPill{display:inline-flex;align-items:center;gap:6px;padding:4px 9px;border-radius:8px;border:1px solid}
+  .statusPillText{font-family:var(--barlow);font-weight:600;font-size:11px;letter-spacing:-0.22px;text-transform:uppercase;line-height:1;color:inherit}
+  .statusDot{width:11px;height:11px;border-radius:999px;flex-shrink:0}
+  .statusDot.ring{border:1.6px solid currentColor;background:transparent}
+  .statusDot.filled{background:currentColor;width:9px;height:9px}
+  .statusCheck{width:13px;height:13px;flex-shrink:0;color:inherit}
+  .statusPill.onsite{background:var(--accent);border-color:var(--accent);color:var(--ink)}
+  .statusPill.confirmed{background:var(--accent);border-color:var(--accent);color:var(--ink)}
+  .statusPill.pending{background:var(--surface);border-color:var(--line);color:var(--ink2)}
+  .statusPill.pendingMe{background:rgba(255,255,255,0.18);border-color:rgba(255,255,255,0.35);color:var(--brandInk)}
+  /* pill tags cut from the real app screenshots */
+  .moodPill{display:block;height:24px;width:auto;margin-top:6px}
+  .statusPillImg{display:block;height:23px;width:auto}
+
+  /* meeting point */
+  .meetingNameText{font-family:var(--barlow);font-weight:500;font-size:16px;line-height:24px;color:var(--ink2);padding:0 24px;margin-top:-2px;margin-bottom:12px}
+  .meetingCard{margin:0 16px 18px;border-radius:18px;overflow:hidden}
+  .meetingCard img{width:100%;height:auto;display:block}
+
+  /* sticky check-in */
+  .stickyWrap{position:absolute;left:0;right:0;bottom:0;padding:16px 20px 34px;z-index:18}
+  .stickyBg{position:absolute;inset:0;background:linear-gradient(rgba(250,247,240,0) 0%,var(--bg) 70%);pointer-events:none}
+  .checkInBtn{position:relative;width:100%;padding:18px 20px;border-radius:999px;background:var(--ink);display:flex;align-items:center;justify-content:center}
+  .checkInText{font-family:var(--display);font-weight:800;font-size:18px;letter-spacing:0.36px;text-transform:uppercase;color:var(--bg)}
+  .checkInNote{position:relative;font-family:var(--barlow);font-weight:500;font-size:12px;color:var(--ink3);text-align:center;margin-top:8px}
+</style>
+</head>
+<body>
+  <div class="device">
+    <div class="screen">
+      <div class="notch"></div>
+      <div class="statusbar"></div>
+      <div class="topFade"></div>
+      <span class="topBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg></span>
+
+      <div class="scroll">
+        <div class="scrollContent">
+
+          <!-- Hero ticket -->
+          <div class="hero">
+            <div class="heroBody">
+              <div class="heroEventTitle">Sunrise Trail Run</div>
+              <div class="anticipationRow">
+                <div class="anticipationCol">
+                  <div class="anticipationEyebrow">Your group</div>
+                  <div class="heroAvatarRow">
+                    <div class="av" style="background:url('assets/face-dori.jpg') center/cover;z-index:4"></div>
+                    <div class="av" style="background:url('assets/face-mira.jpg') center/cover;z-index:3"></div>
+                    <div class="av" style="background:url('assets/face-jonas.jpg') center/cover;z-index:2"></div>
+                    <div class="av" style="background:url('assets/face-alex.jpg') center/cover;z-index:1"></div>
+                  </div>
+                </div>
+                <div class="anticipationDivider"></div>
+                <div class="anticipationCol">
+                  <div class="anticipationEyebrow">Starts in</div>
+                  <div class="anticipationCountdown">00:12:00</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Group at a glance -->
+          <div class="glance">
+            <div class="glanceCellsRow">
+              <div class="glanceCell"><div class="glanceTileLabel">Ages</div><div class="glanceTileValue">24–29</div></div>
+              <div class="glanceVDivider"></div>
+              <div class="glanceCell"><div class="glanceTileLabel">Men</div><div class="glanceTileValue">2</div></div>
+              <div class="glanceVDivider"></div>
+              <div class="glanceCell"><div class="glanceTileLabel">Women</div><div class="glanceTileValue">2</div></div>
+            </div>
+            <div class="glanceHDivider"></div>
+            <div class="glanceTileLabel">Shared sports</div>
+            <div class="sportChipRow">
+              <span class="sportChip all"><span class="sportChipEmoji">🏃</span><span class="sportChipText">Running</span><span class="sportChipBadge"><span class="sportChipBadgeText">4/4</span></span></span>
+              <span class="sportChip some"><span class="sportChipEmoji">🎾</span><span class="sportChipText">Tennis</span><span class="sportChipBadge"><span class="sportChipBadgeText">2/4</span></span></span>
+            </div>
+          </div>
+
+          <!-- Group thread -->
+          <div class="sectionHeader">
+            <span class="sectionTitle">Group thread</span>
+            <span class="postBtn"><span class="postBtnText">+ Post</span></span>
+          </div>
+          <div class="chatCard">
+            <div class="chatRow">
+              <div class="chatAv" style="background:url('assets/face-mira.jpg') center/cover"></div>
+              <div class="chatMain">
+                <div class="chatHeader"><span class="chatAuthor">Mira</span><span class="chatTimestamp">12m ago</span></div>
+                <img class="reactionPill" src="assets/pill-onmyway.png" alt="On my way!">
+              </div>
+            </div>
+            <div class="chatRow">
+              <div class="chatAv" style="background:url('assets/face-jonas.jpg') center/cover"></div>
+              <div class="chatMain">
+                <div class="chatHeader"><span class="chatAuthor">Jonas</span><span class="chatTimestamp">8m ago</span></div>
+                <div class="chatBody">Bringing water for everyone 💧</div>
+              </div>
+            </div>
+            <div class="chatRow me">
+              <div class="chatAv" style="background:url('assets/face-alex.jpg') center/cover"></div>
+              <div class="chatMain">
+                <div class="chatHeader"><span class="chatAuthor">Me</span><span class="chatTimestamp">just now</span></div>
+                <div class="chatBody">See you at the red gate!</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- The lineup -->
+          <div class="sectionHeader"><span class="sectionTitle">The lineup</span></div>
+          <div class="lineup">
+            <div class="memberRow neutral">
+              <div class="avatarWrap"><div class="avatar" style="background:url('assets/face-mira.jpg') center/cover"></div></div>
+              <div class="memberMain">
+                <div class="nameRow"><span class="memberName">Mira</span><span class="memberAge">· 26</span></div>
+                <img class="moodPill" src="assets/pill-focused.png" alt="Focused">
+              </div>
+              <div class="memberRight"><span class="statusPill onsite"><span class="statusDot filled"></span><span class="statusPillText">On site</span></span></div>
+            </div>
+
+            <div class="memberRow neutral">
+              <div class="avatarWrap"><div class="avatar" style="background:url('assets/face-dori.jpg') center/cover"></div></div>
+              <div class="memberMain">
+                <div class="nameRow"><span class="memberName">Dóri</span><span class="memberAge">· 27</span></div>
+                <img class="moodPill" src="assets/pill-pumped.png" alt="Pumped">
+              </div>
+              <div class="memberRight"><span class="statusPill confirmed"><svg class="statusCheck" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4 10-11"/></svg><span class="statusPillText">Confirmed</span></span></div>
+            </div>
+
+            <div class="memberRow me">
+              <div class="avatarWrap"><div class="avatar" style="background:url('assets/face-alex.jpg') center/cover"></div></div>
+              <div class="memberMain">
+                <div class="nameRow"><span class="memberName">Alex</span><span class="memberAge">· 24</span><span class="memberYouBadge">· You</span></div>
+                <img class="moodPill" src="assets/pill-relaxed.png" alt="Relaxed">
+              </div>
+              <div class="memberRight"><span class="statusPill onsite"><span class="statusDot filled"></span><span class="statusPillText">On site</span></span></div>
+            </div>
+
+            <div class="memberRow neutral">
+              <div class="avatarWrap"><div class="avatar" style="background:url('assets/face-jonas.jpg') center/cover"></div></div>
+              <div class="memberMain">
+                <div class="nameRow"><span class="memberName">Jonas</span><span class="memberAge">· 29</span></div>
+                <img class="moodPill" src="assets/pill-social.png" alt="Social">
+              </div>
+              <div class="memberRight"><span class="statusPill confirmed"><svg class="statusCheck" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4 10-11"/></svg><span class="statusPillText">Confirmed</span></span></div>
+            </div>
+          </div>
+
+          <!-- Meeting point -->
+          <div class="sectionHeader"><span class="sectionTitle">Meeting point</span></div>
+          <div class="meetingNameText">Normafa</div>
+          <div class="meetingCard">
+            <img src="assets/map-group.png" alt="Normafa map">
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Sticky check-in CTA (check-in active state) -->
+      <div class="stickyWrap">
+        <div class="stickyBg"></div>
+        <div class="checkInBtn" style="background:var(--line)"><span class="checkInText" style="color:var(--ink3)">Checked in</span></div>
+        <div class="checkInNote">Profiles are now revealed!</div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

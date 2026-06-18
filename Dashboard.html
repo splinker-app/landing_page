@@ -1,0 +1,455 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Splinker — Dashboard</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@500;700;800&family=Barlow+Condensed:wght@500;700;800&family=Barlow+Semi+Condensed:wght@500;600;700;800&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  /* ===== Tokens — src/theme/tokens.ts (1:1) ===== */
+  :root{
+    --bg:#FAF7F0; --surface:#FFFFFF; --surface2:#ECE6D7; --line:#E0D6C1;
+    --ink:#14110E; --ink2:#3A332C; --ink3:#7A6F60;
+    --brand:#EE4A23; --brandInk:#FFFFFF;
+    --accent:#C6F24E; --chipBg:#14110E; --chipInk:#FAF7F0;
+    /* font families — map to typography.families */
+    --display:'Barlow Condensed';      /* displayExtraBold 800 / displayMedium 500 */
+    --semi:'Barlow Semi Condensed';    /* semiBold 700 / semiMedium 500 */
+    --barlow:'Barlow';                 /* barlowBold 700 / barlowMedium 500 */
+    --inter:'Inter';                   /* bodyBold 700 / bodyRegular 400 */
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:#3a352e;font-family:var(--inter);display:flex;justify-content:center;align-items:flex-start;min-height:100vh;padding:40px 16px}
+
+  /* ===== iPhone frame ===== */
+  .device{width:390px;height:844px;border-radius:54px;background:#0c0907;padding:5px;box-shadow:0 40px 80px rgba(0,0,0,0.5);position:relative}
+  .screen{width:100%;height:100%;border-radius:49px;background:var(--bg);overflow:hidden;position:relative}
+  .notch{position:absolute;top:10px;left:50%;transform:translateX(-50%);width:120px;height:30px;background:#0c0907;border-radius:18px;z-index:30}
+  .statusbar{position:absolute;top:0;left:0;right:0;height:50px;display:flex;align-items:flex-end;justify-content:space-between;padding:0 28px 6px;font-size:14px;font-weight:600;color:var(--ink);z-index:20;font-family:-apple-system,var(--inter)}
+  .scroll{position:absolute;inset:0;overflow-y:auto;overflow-x:hidden}
+  .scroll::-webkit-scrollbar{display:none}
+  /* paddingTop insets.top(50) + 16 ; paddingBottom inset + 120 */
+  .feed{padding-top:66px;padding-bottom:140px}
+  .hpad{padding-left:16px;padding-right:16px}
+  .topfade{position:absolute;top:0;left:0;right:0;height:50px;background:linear-gradient(var(--bg),rgba(250,247,240,0));z-index:15;pointer-events:none}
+
+  /* ===== Greeting + score (index.tsx greetingContainer) ===== */
+  .greeting{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:20px}
+  .greeting .left{flex-shrink:1;margin-right:12px;min-width:0}
+  .dateLabel{font-family:var(--inter);font-weight:700;font-size:10px;letter-spacing:1.4px;text-transform:uppercase;color:var(--ink3);margin-bottom:6px}
+  .greetingText{font-family:var(--display);font-weight:800;font-size:42px;letter-spacing:-0.84px;line-height:40px;color:var(--ink);text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .score{display:inline-flex;align-items:center;gap:8px;background:var(--brand);padding:10px 14px;border-radius:999px;flex-shrink:0}
+  .score .star{font-size:14px;color:var(--brandInk);line-height:1}
+  .score .num{font-family:var(--display);font-weight:800;font-size:18px;letter-spacing:-0.18px;color:var(--brandInk)}
+  .score .lbl{font-family:var(--inter);font-weight:700;font-size:10px;letter-spacing:1.4px;text-transform:uppercase;color:var(--brandInk);opacity:0.8}
+
+  /* ===== MatchmakingCountdown — countdown state (dark ink card) ===== */
+  .mmc{background:var(--ink);border-radius:28px;padding:22px;margin-top:12px;margin-bottom:8px}
+  .mmc-top{margin-bottom:18px}
+  .mmc-micro{font-family:var(--inter);font-weight:700;font-size:10px;letter-spacing:1.4px;text-transform:uppercase;color:var(--bg);opacity:0.6;margin-bottom:6px}
+  .mmc-title{font-family:var(--display);font-weight:800;font-size:24px;letter-spacing:-0.48px;line-height:26px;text-transform:uppercase;color:var(--bg)}
+  .mmc-row{display:flex;gap:12px}
+  .mmc-tile{flex:1;border-radius:16px;padding:14px 0;text-align:center;background:rgba(255,255,255,0.1)}
+  .mmc-num{font-family:var(--display);font-weight:800;font-size:28px;letter-spacing:-0.56px;line-height:28px;color:var(--bg)}
+  .mmc-lbl{font-family:var(--inter);font-weight:700;font-size:9px;letter-spacing:1.26px;text-transform:uppercase;color:var(--bg);opacity:0.6;margin-top:4px}
+
+  /* ===== Section header (trendingHeader) ===== */
+  .secHeader{font-family:var(--display);font-weight:800;font-size:26px;letter-spacing:-0.52px;text-transform:uppercase;color:var(--ink);margin-bottom:12px}
+
+  /* ===== Horizontal carousels ===== */
+  .hscroll{display:flex;overflow-x:auto;padding-left:16px;padding-bottom:8px}
+  .hscroll::-webkit-scrollbar{display:none}
+  .trendingWrap{margin-top:24px}
+  .myEventsWrap{margin-top:8px;margin-bottom:24px}
+
+  /* ===== SponsoredEventCard (width 250) ===== */
+  .spon{width:250px;flex-shrink:0;background:var(--surface);border-radius:18px;border:1px solid var(--line);overflow:hidden;margin-right:16px}
+  .spon-cover{width:240px;height:240px;margin:5px auto 0}
+  .spon-cover .img{width:240px;height:240px;border-radius:13px;background:linear-gradient(135deg,#7fb0c4,#3f6f86);position:relative;overflow:hidden}
+  .spon-body{padding:10px 14px 14px}
+  .spon-rule{display:flex;align-items:baseline;justify-content:space-between;gap:8px;padding-bottom:5px;border-bottom:1.5px solid var(--ink);margin-bottom:7px}
+  .spon-rule .l{font-family:var(--inter);font-weight:700;font-size:10px;letter-spacing:1.4px;text-transform:uppercase;color:var(--ink3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .spon-rule .r{flex:1;text-align:right;font-family:var(--inter);font-weight:700;font-size:10px;letter-spacing:0.4px;text-transform:uppercase;color:var(--ink3);white-space:nowrap}
+  .spon-title{font-family:var(--display);font-weight:800;font-size:19px;letter-spacing:-0.38px;line-height:19px;text-transform:uppercase;color:var(--ink);margin-bottom:6px}
+  .spon-addr{display:flex;align-items:center;gap:4px}
+  .spon-addr .t{flex:1;font-family:var(--display);font-weight:500;font-size:14px;letter-spacing:-0.28px;text-transform:uppercase;color:var(--ink2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .spon-pills{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+
+  /* sport/difficulty body pill (shared shape) */
+  .bodyPill{display:inline-flex;align-items:center;gap:4px;padding:5px 10px;border-radius:10px;background:var(--surface);border:1px solid var(--line)}
+  .bodyPill .em{font-size:11px;line-height:13px}
+  .bodyPill .tx{font-family:var(--semi);font-weight:500;font-size:12px;letter-spacing:-0.24px;color:var(--ink2)}
+
+  /* ===== MyEventCard (width 280) ===== */
+  .myev{width:280px;flex-shrink:0;background:var(--surface);border-radius:18px;border:1px solid var(--line);padding:14px;margin-right:12px;position:relative}
+  .myev-head{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+  .myev-tile{width:64px;height:64px;border-radius:6px;flex-shrink:0;background:linear-gradient(135deg,#caa07a,#7c5a3c)}
+  .myev-htext{flex:1;min-width:0}
+  .myev-org{font-family:var(--inter);font-weight:700;font-size:10px;letter-spacing:1.4px;text-transform:uppercase;color:var(--ink3);margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .myev-title{font-family:var(--display);font-weight:800;font-size:19px;line-height:21px;letter-spacing:-0.38px;text-transform:uppercase;color:var(--ink)}
+  .myev-pills{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+  .myev-divider{height:1px;background:var(--line);margin-bottom:12px}
+  .myev-daterow{display:flex;align-items:center;gap:12px}
+  .myev-datetile{min-width:56px;padding:8px 10px;border-radius:16px;background:var(--surface2);text-align:center}
+  .myev-month{font-family:var(--semi);font-weight:500;font-size:12px;letter-spacing:-0.24px;color:var(--brand);margin-bottom:2px}
+  .myev-day{font-family:var(--display);font-weight:800;font-size:26px;line-height:26px;letter-spacing:-0.52px;color:var(--ink)}
+  .myev-detail{flex:1;min-width:0}
+  .myev-weekday{font-family:var(--semi);font-weight:500;font-size:14px;letter-spacing:-0.28px;color:var(--ink);margin-bottom:2px}
+  .myev-locrow{display:flex;align-items:center;gap:4px;margin-top:4px}
+  .myev-loc{flex:1;font-family:var(--semi);font-weight:500;font-size:14px;letter-spacing:-0.28px;color:var(--ink2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+  /* sport pill (EventListCard / MyEventCard) */
+  .sportPill{display:inline-flex;align-items:center;gap:4px;padding:5px 10px;border-radius:10px;background:var(--surface);border:1px solid var(--line)}
+  .sportPill .em{font-size:11px;line-height:13px}
+  .sportPill .tx{font-family:var(--semi);font-weight:500;font-size:12px;letter-spacing:-0.24px;color:var(--ink2)}
+
+  /* ===== CalendarStrip ===== */
+  .calscroll{display:flex;gap:8px;overflow-x:auto;padding:0 16px;margin-bottom:16px}
+  .calscroll::-webkit-scrollbar{display:none}
+  .cal-cell{width:53px;flex-shrink:0;padding:12px 0;border-radius:18px;display:flex;flex-direction:column;align-items:center;justify-content:center;background:var(--surface);border:1px solid var(--line)}
+  .cal-cell.active{background:var(--brand);border:none}
+  .cal-letter{font-family:var(--inter);font-weight:700;font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--ink);opacity:0.55}
+  .cal-cell.active .cal-letter{color:var(--brandInk);opacity:0.8}
+  .cal-num{font-family:var(--display);font-weight:800;font-size:20px;line-height:22px;letter-spacing:-0.4px;color:var(--ink);margin-top:2px}
+  .cal-cell.active .cal-num{color:var(--brandInk)}
+  .cal-month{font-family:var(--inter);font-weight:700;font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--ink);opacity:0.55;margin-top:2px}
+  .cal-cell.active .cal-month{color:var(--brandInk);opacity:0.8}
+  .cal-dot{width:4px;height:4px;border-radius:999px;margin-top:6px;background:var(--brand)}
+  .cal-cell.active .cal-dot{background:var(--brandInk)}
+  .cal-dot.empty{background:transparent}
+
+  /* ===== EventListCard ===== */
+  .elc{display:flex;padding:12px;margin-bottom:12px;background:var(--surface);border-radius:18px;border:1px solid var(--line)}
+  .elc-img{width:88px;height:88px;border-radius:6px;background:var(--surface2);margin-right:12px;flex-shrink:0}
+  .elc-content{flex:1;min-width:0}
+  .elc-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;gap:12px}
+  .elc-org{font-family:var(--inter);font-weight:700;font-size:10px;letter-spacing:1.4px;text-transform:uppercase;color:var(--ink3);margin-bottom:2px}
+  .elc-title{font-family:var(--display);font-weight:800;font-size:19px;line-height:21px;letter-spacing:-0.38px;text-transform:uppercase;color:var(--ink)}
+  .elc-tag{padding:5px 10px;border-radius:10px;flex-shrink:0;display:flex;align-items:center;justify-content:center}
+  .elc-tag.going{background:var(--accent)}
+  .elc-tag.open{background:var(--chipBg)}
+  .elc-tagtext{font-family:var(--semi);font-weight:700;font-size:14px;letter-spacing:-0.28px;text-transform:uppercase}
+  .elc-tag.going .elc-tagtext{color:var(--ink)}
+  .elc-tag.open .elc-tagtext{color:var(--chipInk)}
+  .elc-meta{display:flex;align-items:center;gap:5px;margin-top:2px}
+  .elc-meta .tx{flex:1;font-family:var(--semi);font-weight:500;font-size:14px;letter-spacing:-0.28px;color:var(--ink2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .elc-pills{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+
+  .ic{flex-shrink:0}
+  .cover{overflow:hidden}
+  .cover svg{display:block;width:100%;height:100%}
+</style>
+</head>
+<body>
+  <div class="device">
+    <div class="screen">
+      <div class="notch"></div>
+      <div class="statusbar"></div>
+      <div class="topfade"></div>
+
+      <div class="scroll">
+        <div class="feed">
+
+          <!-- Greeting + score pill -->
+          <div class="greeting hpad">
+            <div class="left">
+              <div class="dateLabel">Sunday · Apr 19</div>
+              <div class="greetingText">Hi, Dóri!</div>
+            </div>
+            <div class="score">
+              <span class="star">★</span>
+              <span class="num">1,240</span>
+              <span class="lbl">PTS</span>
+            </div>
+          </div>
+
+          <!-- MatchmakingCountdown (countdown state) -->
+          <div class="hpad">
+            <div class="mmc">
+              <div class="mmc-top">
+                <div class="mmc-micro">Matching in</div>
+                <div class="mmc-title">Sunrise Trail Run · Today</div>
+              </div>
+              <div class="mmc-row">
+                <div class="mmc-tile"><div class="mmc-num">00</div><div class="mmc-lbl">Days</div></div>
+                <div class="mmc-tile"><div class="mmc-num">04</div><div class="mmc-lbl">Hrs</div></div>
+                <div class="mmc-tile"><div class="mmc-num">22</div><div class="mmc-lbl">Min</div></div>
+                <div class="mmc-tile"><div class="mmc-num">41</div><div class="mmc-lbl">Sec</div></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Sponsored events -->
+          <div class="trendingWrap">
+            <div class="secHeader hpad">Featured events</div>
+            <div class="hscroll">
+              <div class="spon">
+                <div class="spon-cover"><div class="img cover" id="cv-spon1"></div></div>
+                <div class="spon-body">
+                  <div class="spon-rule">
+                    <span class="l">Splinker</span>
+                    <span class="r">Apr 22 · 18:00</span>
+                  </div>
+                  <div class="spon-title">Riverside Run Day</div>
+                  <div class="spon-addr">
+                    <svg class="ic" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#3A332C" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                    <span class="t">Budapest, XIII.</span>
+                  </div>
+                  <div class="spon-pills">
+                    <span class="bodyPill"><span class="em">🏃</span><span class="tx">Running</span></span>
+                    <span class="bodyPill"><span class="tx">All levels</span></span>
+                  </div>
+                </div>
+              </div>
+              <div class="spon">
+                <div class="spon-cover"><div class="img cover" id="cv-spon2"></div></div>
+                <div class="spon-body">
+                  <div class="spon-rule">
+                    <span class="l">Nike Run Club</span>
+                    <span class="r">Apr 24 · 07:00</span>
+                  </div>
+                  <div class="spon-title">City Dawn 10K</div>
+                  <div class="spon-addr">
+                    <svg class="ic" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#3A332C" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                    <span class="t">Budapest, V.</span>
+                  </div>
+                  <div class="spon-pills">
+                    <span class="bodyPill"><span class="em">🏃</span><span class="tx">Running</span></span>
+                    <span class="bodyPill"><span class="tx">Moderate</span></span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- My Events -->
+          <div class="myEventsWrap">
+            <div class="secHeader hpad">My Events</div>
+            <div class="hscroll">
+              <div class="myev">
+                <div class="myev-head">
+                  <div class="myev-tile cover" id="cv-myev1"></div>
+                  <div class="myev-htext">
+                    <div class="myev-org">Runners Budapest</div>
+                    <div class="myev-title">Sunrise Trail Run</div>
+                    <div class="myev-pills">
+                      <span class="sportPill"><span class="em">🏃</span><span class="tx">Running</span></span>
+                      <span class="sportPill"><span class="tx">Easy</span></span>
+                    </div>
+                  </div>
+                </div>
+                <div class="myev-divider"></div>
+                <div class="myev-daterow">
+                  <div class="myev-datetile">
+                    <div class="myev-month">Apr</div>
+                    <div class="myev-day">19</div>
+                  </div>
+                  <div class="myev-detail">
+                    <div class="myev-weekday">Sunday · 06:30</div>
+                    <div class="myev-locrow">
+                      <svg class="ic" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#7A6F60" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                      <span class="myev-loc">Normafa</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="myev">
+                <div class="myev-head">
+                  <div class="myev-tile cover" id="cv-myev2"></div>
+                  <div class="myev-htext">
+                    <div class="myev-org">BME Sports</div>
+                    <div class="myev-title">Evening Run Club</div>
+                    <div class="myev-pills">
+                      <span class="sportPill"><span class="em">🏃</span><span class="tx">Running</span></span>
+                      <span class="sportPill"><span class="tx">Moderate</span></span>
+                    </div>
+                  </div>
+                </div>
+                <div class="myev-divider"></div>
+                <div class="myev-daterow">
+                  <div class="myev-datetile">
+                    <div class="myev-month">Apr</div>
+                    <div class="myev-day">21</div>
+                  </div>
+                  <div class="myev-detail">
+                    <div class="myev-weekday">Tuesday · 18:00</div>
+                    <div class="myev-locrow">
+                      <svg class="ic" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#7A6F60" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                      <span class="myev-loc">Margitsziget</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Upcoming events header -->
+          <div class="hpad" style="margin-top:8px">
+            <div class="secHeader">Upcoming events</div>
+          </div>
+
+          <!-- Calendar strip -->
+          <div class="calscroll">
+            <div class="cal-cell active"><div class="cal-letter">Sun</div><div class="cal-num">19</div><div class="cal-month">Apr</div><div class="cal-dot"></div></div>
+            <div class="cal-cell"><div class="cal-letter">Mon</div><div class="cal-num">20</div><div class="cal-month">Apr</div><div class="cal-dot empty"></div></div>
+            <div class="cal-cell"><div class="cal-letter">Tue</div><div class="cal-num">21</div><div class="cal-month">Apr</div><div class="cal-dot"></div></div>
+            <div class="cal-cell"><div class="cal-letter">Wed</div><div class="cal-num">22</div><div class="cal-month">Apr</div><div class="cal-dot"></div></div>
+            <div class="cal-cell"><div class="cal-letter">Thu</div><div class="cal-num">23</div><div class="cal-month">Apr</div><div class="cal-dot empty"></div></div>
+            <div class="cal-cell"><div class="cal-letter">Fri</div><div class="cal-num">24</div><div class="cal-month">Apr</div><div class="cal-dot"></div></div>
+            <div class="cal-cell"><div class="cal-letter">Sat</div><div class="cal-num">25</div><div class="cal-month">Apr</div><div class="cal-dot empty"></div></div>
+          </div>
+
+          <!-- Events for selected date (today) -->
+          <div class="trendingWrap hpad" style="margin-top:24px">
+            <div class="elc">
+              <div class="elc-img cover" id="cv-elc1"></div>
+              <div class="elc-content">
+                <div class="elc-header">
+                  <div style="flex:1;min-width:0">
+                    <div class="elc-org">Runners Budapest</div>
+                    <div class="elc-title">Sunrise Trail Run</div>
+                  </div>
+                  <div class="elc-tag going"><span class="elc-tagtext">Going</span></div>
+                </div>
+                <div class="elc-meta">
+                  <svg class="ic" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#7A6F60" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+                  <span class="tx">Sun, Apr 19 • 06:30</span>
+                </div>
+                <div class="elc-meta">
+                  <svg class="ic" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#7A6F60" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                  <span class="tx">Normafa</span>
+                </div>
+                <div class="elc-pills">
+                  <span class="sportPill"><span class="em">🏃</span><span class="tx">Running</span></span>
+                  <span class="sportPill"><span class="tx">Easy</span></span>
+                </div>
+              </div>
+            </div>
+
+            <div class="elc">
+              <div class="elc-img cover" id="cv-elc2"></div>
+              <div class="elc-content">
+                <div class="elc-header">
+                  <div style="flex:1;min-width:0">
+                    <div class="elc-org">by Huddle</div>
+                    <div class="elc-title">City Loop Run</div>
+                  </div>
+                  <div class="elc-tag open"><span class="elc-tagtext">Open</span></div>
+                </div>
+                <div class="elc-meta">
+                  <svg class="ic" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#7A6F60" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+                  <span class="tx">Sun, Apr 19 • 17:00</span>
+                </div>
+                <div class="elc-meta">
+                  <svg class="ic" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#7A6F60" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                  <span class="tx">Városliget</span>
+                </div>
+                <div class="elc-pills">
+                  <span class="sportPill"><span class="em">🏃</span><span class="tx">Running</span></span>
+                  <span class="sportPill"><span class="tx">All levels</span></span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+  /* ---- Generated running-event "marketing cover" art (SVG, on-brand) ---- */
+  (function(){
+    const DISP = "'Barlow Condensed',sans-serif";
+    const BODY = "'Inter',sans-serif";
+    const wrap = (inner) =>
+      `<svg viewBox="0 0 800 800" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">${inner}</svg>`;
+
+    // halftone dot cluster (top-right) for the cream poster
+    function dots(){
+      let s = '<g fill="#EE4A23" opacity="0.16">';
+      for (let r=0;r<5;r++) for (let c=0;c<5;c++){
+        s += `<circle cx="${560+c*48}" cy="${120+r*48}" r="${10-r}"/>`;
+      }
+      return s + '</g>';
+    }
+
+    const covers = {
+      // SUNRISE TRAIL RUN
+      sunrise: wrap(`
+        <defs><linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#FFB05A"/><stop offset="0.55" stop-color="#FF7A38"/><stop offset="1" stop-color="#EE4A23"/></linearGradient></defs>
+        <rect width="800" height="800" fill="url(#sky)"/>
+        <circle cx="605" cy="250" r="135" fill="#FFE3B0" opacity="0.9"/>
+        <path d="M0 560 Q210 480 420 545 T800 515 L800 800 L0 800 Z" fill="#C8381A"/>
+        <path d="M0 650 Q240 590 450 650 T800 618 L800 800 L0 800 Z" fill="#8E2410"/>
+        <path d="M70 715 C 250 660 320 690 470 610 S 690 560 752 486" fill="none" stroke="#FAF7F0" stroke-width="7" stroke-linecap="round" stroke-dasharray="2 22"/>
+        <circle cx="70" cy="715" r="13" fill="#C6F24E"/><circle cx="752" cy="486" r="13" fill="#FAF7F0"/>
+        <text x="66" y="110" fill="#FFE9D2" font-family="${BODY}" font-size="24" font-weight="700" letter-spacing="6">RUNNERS BUDAPEST · NORMAFA</text>
+        <text x="56" y="252" fill="#FAF7F0" font-family="${DISP}" font-size="158" font-weight="800" letter-spacing="-5">SUNRISE</text>
+        <text x="56" y="380" fill="#FAF7F0" font-family="${DISP}" font-size="158" font-weight="800" letter-spacing="-5">TRAIL RUN</text>`),
+
+      // EVENING RUN CLUB
+      club: wrap(`
+        <rect width="800" height="800" fill="#14110E"/>
+        <polygon points="0,160 800,0 800,130 0,360" fill="#C6F24E" opacity="0.16"/>
+        <circle cx="650" cy="175" r="72" fill="#FAF7F0"/><circle cx="690" cy="155" r="60" fill="#14110E"/>
+        <g fill="#C6F24E"><circle cx="120" cy="120" r="4"/><circle cx="250" cy="80" r="3"/><circle cx="430" cy="135" r="4"/><circle cx="520" cy="90" r="3"/></g>
+        <path d="M60 705 C 240 665 330 705 480 645 S 700 600 760 520" fill="none" stroke="#C6F24E" stroke-width="7" stroke-linecap="round" stroke-dasharray="2 22"/>
+        <text x="66" y="120" fill="#C6F24E" font-family="${BODY}" font-size="24" font-weight="700" letter-spacing="6">BME SPORTS · MARGITSZIGET</text>
+        <text x="56" y="430" fill="#FAF7F0" font-family="${DISP}" font-size="152" font-weight="800" letter-spacing="-5">EVENING</text>
+        <text x="56" y="560" fill="#C6F24E" font-family="${DISP}" font-size="152" font-weight="800" letter-spacing="-5">RUN CLUB</text>`),
+
+      // RIVERSIDE RUN DAY
+      riverside: wrap(`
+        <defs><linearGradient id="riv" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#3E8DA6"/><stop offset="1" stop-color="#15384A"/></linearGradient></defs>
+        <rect width="800" height="800" fill="url(#riv)"/>
+        <circle cx="610" cy="215" r="120" fill="#FF8A3D"/>
+        <g fill="none" stroke="#FAF7F0" stroke-width="6" opacity="0.45">
+          <path d="M-20 580 Q 100 545 220 580 T 460 580 T 700 580 T 940 580"/>
+          <path d="M-20 645 Q 100 610 220 645 T 460 645 T 700 645 T 940 645"/>
+          <path d="M-20 710 Q 100 675 220 710 T 460 710 T 700 710 T 940 710"/></g>
+        <text x="66" y="110" fill="#DDEAF0" font-family="${BODY}" font-size="24" font-weight="700" letter-spacing="6">SPLINKER · RIVERBANK</text>
+        <text x="56" y="322" fill="#FAF7F0" font-family="${DISP}" font-size="152" font-weight="800" letter-spacing="-5">RIVERSIDE</text>
+        <text x="56" y="450" fill="#FAF7F0" font-family="${DISP}" font-size="152" font-weight="800" letter-spacing="-5">RUN DAY</text>`),
+
+      // CITY DAWN 10K
+      dawn10k: wrap(`
+        <rect width="800" height="800" fill="#14110E"/>
+        <text x="400" y="455" fill="#EE4A23" font-family="${DISP}" font-size="430" font-weight="800" letter-spacing="-14" text-anchor="middle">10K</text>
+        <g fill="#241E18"><rect x="40" y="560" width="60" height="120"/><rect x="115" y="600" width="50" height="80"/><rect x="180" y="540" width="70" height="140"/><rect x="265" y="595" width="48" height="85"/><rect x="330" y="565" width="64" height="115"/><rect x="410" y="600" width="50" height="80"/><rect x="475" y="545" width="72" height="135"/><rect x="560" y="592" width="50" height="88"/><rect x="625" y="560" width="66" height="120"/><rect x="705" y="600" width="55" height="80"/></g>
+        <rect x="0" y="678" width="800" height="10" fill="#EE4A23"/>
+        <text x="66" y="120" fill="#C6F24E" font-family="${BODY}" font-size="24" font-weight="700" letter-spacing="6">NIKE RUN CLUB · CITY CENTRE</text>
+        <text x="56" y="752" fill="#FAF7F0" font-family="${DISP}" font-size="86" font-weight="800" letter-spacing="-2">CITY DAWN 10K</text>`),
+
+      // CITY LOOP RUN
+      loop: wrap(`
+        <rect width="800" height="800" fill="#FAF7F0"/>
+        ${dots()}
+        <ellipse cx="400" cy="565" rx="300" ry="150" fill="none" stroke="#EE4A23" stroke-width="9" stroke-dasharray="4 26" stroke-linecap="round"/>
+        <circle cx="700" cy="565" r="15" fill="#14110E"/>
+        <polygon points="392,408 372,440 412,440" fill="#EE4A23"/>
+        <text x="66" y="110" fill="#7A6F60" font-family="${BODY}" font-size="24" font-weight="700" letter-spacing="6">HUDDLE · VÁROSLIGET</text>
+        <text x="56" y="252" fill="#14110E" font-family="${DISP}" font-size="156" font-weight="800" letter-spacing="-5">CITY LOOP</text>
+        <text x="56" y="380" fill="#EE4A23" font-family="${DISP}" font-size="156" font-weight="800" letter-spacing="-5">RUN</text>`),
+    };
+
+    const map = {
+      'cv-spon1': 'riverside',
+      'cv-spon2': 'dawn10k',
+      'cv-myev1': 'sunrise',
+      'cv-myev2': 'club',
+      'cv-elc1':  'sunrise',
+      'cv-elc2':  'loop',
+    };
+    for (const id in map){
+      const el = document.getElementById(id);
+      if (el) el.innerHTML = covers[map[id]];
+    }
+  })();
+  </script>
+</body>
+</html>

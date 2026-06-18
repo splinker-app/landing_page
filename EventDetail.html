@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Splinker — Event Detail</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@500;600;700;800&family=Barlow+Condensed:wght@500;700;800&family=Barlow+Semi+Condensed:wght@500;600;700;800&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  /* ===== Tokens — src/theme/tokens.ts ===== */
+  :root{
+    --bg:#FAF7F0; --surface:#FFFFFF; --surface2:#ECE6D7; --line:#E0D6C1;
+    --ink:#14110E; --ink2:#3A332C; --ink3:#7A6F60;
+    --brand:#EE4A23; --brandInk:#FFFFFF;
+    --accent:#C6F24E; --chipBg:#14110E; --chipInk:#FAF7F0;
+    --display:'Barlow Condensed'; --semi:'Barlow Semi Condensed'; --barlow:'Barlow'; --inter:'Inter';
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:#3a352e;font-family:var(--inter);display:flex;justify-content:center;align-items:flex-start;min-height:100vh;padding:40px 16px}
+
+  /* ===== iPhone frame ===== */
+  .device{width:390px;height:844px;border-radius:54px;background:#0c0907;padding:5px;box-shadow:0 40px 80px rgba(0,0,0,0.5);position:relative}
+  .screen{width:100%;height:100%;border-radius:49px;background:var(--bg);overflow:hidden;position:relative}
+  .notch{position:absolute;top:10px;left:50%;transform:translateX(-50%);width:120px;height:30px;background:#0c0907;border-radius:18px;z-index:30}
+  .statusbar{position:absolute;top:0;left:0;right:0;height:50px;display:flex;align-items:flex-end;justify-content:space-between;padding:0 28px 6px;font-size:14px;font-weight:600;color:var(--ink);z-index:25;font-family:-apple-system,var(--inter)}
+
+  /* floating header (headerTransparent) */
+  .hdr{position:absolute;top:54px;left:16px;right:16px;display:flex;justify-content:space-between;z-index:20}
+  .circleButton{width:40px;height:40px;border-radius:999px;background:var(--surface);border:1px solid var(--line);display:flex;align-items:center;justify-content:center}
+  .circleButton svg{width:20px;height:20px;color:var(--ink)}
+  .topFade{position:absolute;top:0;left:0;right:0;height:104px;background:linear-gradient(var(--bg),rgba(250,247,240,0));z-index:15;pointer-events:none}
+
+  .scroll{position:absolute;inset:0;overflow-y:auto;overflow-x:hidden}
+  .scroll::-webkit-scrollbar{display:none}
+  .scrollContent{padding-top:94px;padding-bottom:150px}
+
+  /* hero image — inset rounded square cover (source: imageCard 0.9w square, radius 16) */
+  .imageWrapper{display:flex;justify-content:center;margin-top:16px}
+  .imageCard{width:90%;aspect-ratio:1;border-radius:16px;overflow:hidden;background:#f0f0f0}
+  .imageCard img{width:100%;height:100%;display:block;object-fit:cover}
+
+  .content{padding:12px 24px 20px}
+  .sportLabel{font-family:var(--inter);font-weight:700;font-size:10px;letter-spacing:1.4px;text-transform:uppercase;color:var(--ink3);margin-bottom:6px}
+  .titleRow{margin-bottom:16px}
+  .title{font-family:var(--display);font-weight:800;font-size:38px;letter-spacing:-0.76px;line-height:38px;text-transform:uppercase;color:var(--ink)}
+
+  /* tag pills */
+  .tagPillsRow{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:24px}
+  .tagPillSport{display:flex;align-items:center;gap:4px;background:var(--accent);padding:5px 10px;border-radius:10px}
+  .tagPillEmoji{font-size:12px;line-height:14px}
+  .tagPillSportText{font-family:var(--semi);font-weight:700;font-size:14px;letter-spacing:-0.28px;text-transform:uppercase;color:var(--ink)}
+  .tagPillDifficulty{background:var(--chipBg);padding:5px 10px;border-radius:10px;display:flex;align-items:center;justify-content:center}
+  .tagPillDifficultyText{font-family:var(--semi);font-weight:700;font-size:14px;letter-spacing:-0.28px;text-transform:uppercase;color:var(--chipInk)}
+
+  /* meta row */
+  .metaRow{display:flex;align-items:flex-start;gap:16px;margin-bottom:16px}
+  .metaCell{flex:1}
+  .metaLabel{font-family:var(--inter);font-weight:700;font-size:10px;letter-spacing:1.4px;text-transform:uppercase;color:var(--ink3);margin-bottom:6px}
+  .metaValue{font-family:var(--display);font-weight:800;font-size:18px;letter-spacing:-0.36px;text-transform:uppercase;color:var(--ink)}
+  .metaSubvalue{font-family:var(--barlow);font-weight:500;font-size:14px;color:var(--ink3);margin-top:2px}
+  .metaDivider{width:1px;height:38px;background:var(--line)}
+
+  /* map — cut from the real app screenshot (pin + Maps attribution baked in) */
+  .mapWrapper{margin-top:4px;margin-bottom:24px;border-radius:18px;overflow:hidden}
+  .mapWrapper img{width:100%;height:auto;display:block}
+
+  /* description */
+  .section{margin-top:0}
+  .sectionTitle{font-family:var(--display);font-weight:800;font-size:22px;letter-spacing:-0.44px;text-transform:uppercase;color:var(--ink);margin-bottom:8px}
+  .description{font-family:var(--barlow);font-weight:500;font-size:16px;line-height:24px;color:var(--ink2)}
+
+  /* sticky button — Groups Revealed Soon (joined / disabled) */
+  .stickyButtonContainer{position:absolute;left:0;right:0;bottom:0;padding:16px 20px 34px;z-index:18}
+  .stickyButtonBg{position:absolute;inset:0;background:linear-gradient(rgba(250,247,240,0) 0%,var(--bg) 70%);pointer-events:none}
+  .stickyButton{position:relative;width:100%;padding:18px 20px;border-radius:999px;background:var(--line);display:flex;align-items:center;justify-content:space-between}
+  .stickyButtonText{font-family:var(--display);font-weight:800;font-size:18px;letter-spacing:0.36px;text-transform:uppercase;color:var(--ink3)}
+  .stickyButton svg{width:14px;height:14px;color:var(--ink3)}
+  .stickyButtonNote{position:relative;font-family:var(--barlow);font-weight:500;font-size:14px;color:var(--ink3);text-align:center;margin-top:8px}
+</style>
+</head>
+<body>
+  <div class="device">
+    <div class="screen">
+      <div class="notch"></div>
+      <div class="statusbar"></div>
+      <div class="topFade"></div>
+
+      <!-- floating transparent header -->
+      <div class="hdr">
+        <span class="circleButton"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg></span>
+        <span class="circleButton"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg></span>
+      </div>
+
+      <div class="scroll">
+        <div class="scrollContent">
+          <div class="imageWrapper">
+            <div class="imageCard"><img src="assets/cover-sunrise-trail-run.jpg" alt="Sunrise Trail Run"></div>
+          </div>
+
+          <div class="content">
+            <div class="sportLabel">Runners Budapest</div>
+            <div class="titleRow"><div class="title">Sunrise Trail Run</div></div>
+
+            <div class="tagPillsRow">
+              <span class="tagPillSport"><span class="tagPillEmoji">🏃</span><span class="tagPillSportText">Running</span></span>
+              <span class="tagPillDifficulty"><span class="tagPillDifficultyText">All levels</span></span>
+            </div>
+
+            <div class="metaRow">
+              <div class="metaCell">
+                <div class="metaLabel">Starts</div>
+                <div class="metaValue">Apr 19, 06:30</div>
+              </div>
+              <div class="metaDivider"></div>
+              <div class="metaCell">
+                <div class="metaLabel">Location</div>
+                <div class="metaValue">Normafa</div>
+                <div class="metaSubvalue">1121 Budapest</div>
+              </div>
+            </div>
+
+            <div class="mapWrapper">
+              <img src="assets/map-normafa.png" alt="Normafa map">
+            </div>
+
+            <div class="section">
+              <div class="sectionTitle">Description</div>
+              <div class="description">Easy-paced trail run through the Normafa woods. Meet at the ski house, warm up together, then head out as a group at a conversational pace. Coffee after for anyone who wants to hang around. All paces welcome.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- sticky button — groups revealed soon (joined, pre-reveal) -->
+      <div class="stickyButtonContainer">
+        <div class="stickyButtonBg"></div>
+        <div class="stickyButton">
+          <span class="stickyButtonText">Groups Revealed Soon</span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
+        </div>
+        <div class="stickyButtonNote">Groups revealed in 16h 23m 21s</div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

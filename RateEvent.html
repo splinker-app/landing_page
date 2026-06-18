@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Splinker — Rate Event</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@500;700;800&family=Barlow+Condensed:wght@500;700;800&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#FAF7F0; --surface:#FFFFFF; --surface2:#ECE6D7; --line:#E0D6C1;
+    --ink:#14110E; --ink2:#3A332C; --ink3:#7A6F60;
+    --brand:#EE4A23; --brandInk:#FFFFFF; --accent:#C6F24E;
+    --display:'Barlow Condensed'; --barlow:'Barlow'; --inter:'Inter';
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:#3a352e;font-family:var(--barlow);display:flex;justify-content:center;align-items:flex-start;min-height:100vh;padding:40px 16px}
+
+  .device{width:390px;height:844px;border-radius:54px;background:#0c0907;padding:5px;box-shadow:0 40px 80px rgba(0,0,0,0.5);position:relative}
+  .screen{width:100%;height:100%;border-radius:49px;background:var(--bg);overflow:hidden;position:relative}
+  .notch{position:absolute;top:10px;left:50%;transform:translateX(-50%);width:120px;height:30px;background:#0c0907;border-radius:18px;z-index:30}
+  .statusbar{position:absolute;top:0;left:0;right:0;height:50px;display:flex;align-items:flex-end;justify-content:space-between;padding:0 28px 6px;font-size:14px;font-weight:600;color:var(--ink);z-index:25;font-family:-apple-system,var(--inter)}
+  .topFade{position:absolute;top:0;left:0;right:0;height:104px;background:linear-gradient(var(--bg),rgba(250,247,240,0));z-index:15;pointer-events:none}
+
+  .scroll{position:absolute;inset:0;overflow-y:auto;overflow-x:hidden}
+  .scroll::-webkit-scrollbar{display:none}
+  .scrollContent{padding-top:58px;padding-bottom:150px}
+
+  .microLabel{font-family:var(--inter);font-weight:700;font-size:10px;letter-spacing:1.4px;text-transform:uppercase;color:var(--ink3)}
+
+  /* header */
+  .header{padding:8px 24px 28px}
+  .title{font-family:var(--display);font-weight:800;font-size:40px;line-height:38px;letter-spacing:-0.8px;text-transform:uppercase;color:var(--ink)}
+
+  /* event card */
+  .eventCardWrap{padding:0 20px 24px}
+  .eventCard{display:flex;align-items:center;gap:12px;padding:16px;border-radius:18px;background:var(--surface);border:1px solid var(--line)}
+  .eventImage{width:60px;height:60px;border-radius:6px;overflow:hidden;flex-shrink:0}
+  .eventImage img{width:60px;height:60px;object-fit:cover;display:block}
+  .eventTitle{font-family:var(--display);font-weight:800;font-size:18px;letter-spacing:-0.36px;text-transform:uppercase;color:var(--ink)}
+  .eventSubtitle{font-family:var(--barlow);font-weight:500;font-size:13px;color:var(--ink3);margin-top:2px}
+
+  /* star rating */
+  .ratingBlock{padding:8px 24px 24px;display:flex;flex-direction:column;align-items:center}
+  .starRow{display:flex;gap:8px;justify-content:center;margin-bottom:8px}
+  .starRow svg{width:40px;height:40px;display:block}
+  .ratingLabel{font-family:var(--display);font-weight:800;font-size:24px;letter-spacing:-0.48px;text-transform:uppercase;color:var(--ink)}
+
+  /* tags */
+  .tagsWrap{padding:0 24px 24px}
+  .tagGrid{display:flex;flex-wrap:wrap;gap:8px}
+  .tagPill{padding:5px 10px;border-radius:10px;border:1.5px solid}
+  .tagPillOff{background:var(--surface);border-color:var(--line)}
+  .tagPillOn{background:var(--brand);border-color:var(--brand)}
+  .tagText{font-size:14px}
+  .tagTextOff{font-family:var(--barlow);font-weight:500;color:var(--ink2)}
+  .tagTextOn{font-family:var(--barlow);font-weight:700;color:var(--brandInk)}
+
+  /* member rating */
+  .membersWrap{padding:0 24px}
+  .memberRow{display:flex;align-items:center;gap:12px;padding:8px 12px;margin-bottom:10px;border-radius:18px;background:var(--surface);border:1px solid var(--line)}
+  .memberRow.selected{border:2px solid var(--ink);padding:7px 11px}
+  .memberAvatar{width:60px;height:60px;border-radius:999px;border:2px solid var(--surface);flex-shrink:0;object-fit:cover;display:block;background:var(--line)}
+  .memberName{flex:1;font-family:var(--display);font-weight:800;font-size:17px;letter-spacing:-0.34px;text-transform:uppercase;color:var(--ink)}
+  .selectCircle{width:22px;height:22px;border-radius:999px;border:2px solid var(--line);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+  .selectCircle.on{border-color:var(--brand)}
+  .selectDot{width:10px;height:10px;border-radius:999px;background:var(--brand)}
+
+  /* submit sticky */
+  .stickyButtonContainer{position:absolute;left:0;right:0;bottom:0;padding:16px 20px 58px;z-index:18}
+  .stickyButtonBg{position:absolute;inset:0;background:linear-gradient(rgba(250,247,240,0) 0%,rgba(250,247,240,0.3) 60%,var(--bg) 100%);pointer-events:none}
+  .stickyButton{position:relative;width:100%;padding:18px 20px;border-radius:999px;background:var(--brand);display:flex;align-items:center;justify-content:center}
+  .stickyButtonText{font-family:var(--display);font-weight:800;font-size:18px;letter-spacing:0.36px;text-transform:uppercase;color:var(--brandInk)}
+</style>
+</head>
+<body>
+  <div class="device">
+    <div class="screen">
+      <div class="notch"></div>
+      <div class="statusbar"></div>
+      <div class="topFade"></div>
+
+      <div class="scroll">
+        <div class="scrollContent">
+
+          <!-- Header -->
+          <div class="header">
+            <div class="microLabel" style="margin-bottom:8px">Post event · Sun, Apr 19</div>
+            <div class="title">How was Sunrise Trail Run?</div>
+          </div>
+
+          <!-- Event card -->
+          <div class="eventCardWrap">
+            <div class="eventCard">
+              <div class="eventImage"><img src="assets/cover-sunrise-trail-run.jpg" alt="Sunrise Trail Run"></div>
+              <div style="flex:1">
+                <div class="eventTitle">Sunrise Trail Run</div>
+                <div class="eventSubtitle">Normafa</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Star rating -->
+          <div class="ratingBlock">
+            <div class="microLabel" style="margin-bottom:16px">How was your group?</div>
+            <div class="starRow">
+              <svg viewBox="0 0 24 24" fill="var(--brand)"><path d="M12 17.27 18.18 21l-1.64-7.03L21.5 9.24l-7.19-.61L12 2 9.69 8.63 2.5 9.24l5.46 4.73L6.32 21z"/></svg>
+              <svg viewBox="0 0 24 24" fill="var(--brand)"><path d="M12 17.27 18.18 21l-1.64-7.03L21.5 9.24l-7.19-.61L12 2 9.69 8.63 2.5 9.24l5.46 4.73L6.32 21z"/></svg>
+              <svg viewBox="0 0 24 24" fill="var(--brand)"><path d="M12 17.27 18.18 21l-1.64-7.03L21.5 9.24l-7.19-.61L12 2 9.69 8.63 2.5 9.24l5.46 4.73L6.32 21z"/></svg>
+              <svg viewBox="0 0 24 24" fill="var(--brand)"><path d="M12 17.27 18.18 21l-1.64-7.03L21.5 9.24l-7.19-.61L12 2 9.69 8.63 2.5 9.24l5.46 4.73L6.32 21z"/></svg>
+              <svg viewBox="0 0 24 24" fill="none" stroke="var(--line)" stroke-width="1.6" stroke-linejoin="round"><path d="M12 17.27 18.18 21l-1.64-7.03L21.5 9.24l-7.19-.61L12 2 9.69 8.63 2.5 9.24l5.46 4.73L6.32 21z"/></svg>
+            </div>
+            <div class="ratingLabel">Great</div>
+          </div>
+
+          <!-- Tags -->
+          <div class="tagsWrap">
+            <div class="microLabel" style="margin-bottom:12px">What stood out?</div>
+            <div class="tagGrid">
+              <span class="tagPill tagPillOn"><span class="tagText tagTextOn">Great energy</span></span>
+              <span class="tagPill tagPillOff"><span class="tagText tagTextOff">Right skill level</span></span>
+              <span class="tagPill tagPillOn"><span class="tagText tagTextOn">Fun people</span></span>
+              <span class="tagPill tagPillOff"><span class="tagText tagTextOff">Too competitive</span></span>
+              <span class="tagPill tagPillOff"><span class="tagText tagTextOff">Too casual</span></span>
+              <span class="tagPill tagPillOff"><span class="tagText tagTextOff">Skill mismatch</span></span>
+            </div>
+          </div>
+
+          <!-- Member rating -->
+          <div class="membersWrap">
+            <div class="microLabel" style="margin-bottom:12px">Anyone you'd group again?</div>
+            <div class="memberRow selected">
+              <img class="memberAvatar" src="assets/face-mira.jpg" alt="Mira">
+              <div class="memberName">Mira</div>
+              <div class="selectCircle on"><div class="selectDot"></div></div>
+            </div>
+            <div class="memberRow">
+              <img class="memberAvatar" src="assets/face-jonas.jpg" alt="Jonas">
+              <div class="memberName">Jonas</div>
+              <div class="selectCircle"></div>
+            </div>
+            <div class="memberRow">
+              <img class="memberAvatar" src="assets/face-alex.jpg" alt="Alex">
+              <div class="memberName">Alex</div>
+              <div class="selectCircle"></div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Submit sticky -->
+      <div class="stickyButtonContainer">
+        <div class="stickyButtonBg"></div>
+        <div class="stickyButton"><span class="stickyButtonText">Submit rating</span></div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

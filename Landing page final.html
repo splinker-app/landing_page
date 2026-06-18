@@ -1,0 +1,793 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Splinker — Find your sport, find your people</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800;900&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&family=Space+Grotesk:wght@700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#FFFDF8; --surface:#FFFFFF; --surface2:#ECE6D7;
+    --ink:#14110E; --ink2:#3A332C; --ink3:#7A6F60; --line:#E0D6C1;
+    --brand:#EE4A23; --brandInk:#FFFFFF;
+    --accent:#C6F24E; --success:#0E8F4F;
+    --display:'Barlow Condensed', sans-serif;
+    --body:'Inter', system-ui, sans-serif;
+    --mono:'JetBrains Mono', monospace;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{background:var(--bg);color:var(--ink);font-family:var(--body);-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;overflow-x:clip}
+  a{color:inherit;text-decoration:none}
+  button{font:inherit;border:none;cursor:pointer;background:none}
+  ::selection{background:var(--brand);color:var(--brandInk)}
+
+  .display{font-family:var(--display);font-weight:800;letter-spacing:-0.02em;text-transform:uppercase;line-height:0.92}
+  .micro{font-family:var(--body);font-size:11px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--ink3)}
+  .mono{font-family:var(--mono)}
+
+  .wrap{max-width:1280px;margin:0 auto;padding:0 24px}
+
+  /* ===== NAV ===== */
+  nav{position:fixed;top:0;left:0;right:0;z-index:50;background:rgba(255,253,248,0.85);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
+  body{padding-top:73px}
+  .nav-row{display:flex;align-items:center;justify-content:space-between;padding:18px 24px;max-width:1280px;margin:0 auto}
+  .logo{display:flex;align-items:center;gap:10px;font-family:var(--display);font-weight:800;font-size:24px;letter-spacing:-0.01em}
+  /* ===== Splinker wordmark (Space Grotesk 700 + orange i-dot) ===== */
+  .splinker{font-family:'Space Grotesk',sans-serif;font-weight:700;letter-spacing:-0.04em;line-height:1;color:inherit;display:inline-block;white-space:nowrap}
+  .splinker .i{position:relative}
+  .splinker .i::after{content:"";position:absolute;left:0.0515em;top:0.2635em;width:0.1542em;height:0.1542em;border-radius:50%;background:var(--brand);pointer-events:none}
+  .logo-mark{width:32px;height:32px;border-radius:10px;overflow:hidden;display:flex}
+  .logo-mark img{width:100%;height:100%;object-fit:cover;display:block}
+  .nav-links{display:flex;gap:28px;font-size:14px;font-weight:600;color:var(--ink2)}
+  .nav-links a:hover{color:var(--brand)}
+  .nav-cta{padding:10px 18px;border-radius:999px;background:var(--ink);color:var(--bg);font-family:var(--display);font-size:14px;font-weight:800;text-transform:uppercase;letter-spacing:0.04em;transition:transform .15s,background .15s}
+  .nav-cta:hover{background:var(--brand);color:var(--brandInk);transform:translateY(-1px)}
+  @media (max-width:720px){.nav-links{display:none}}
+
+  /* ===== HERO ===== */
+  .hero{padding:80px 0 60px;position:relative;overflow:hidden}
+  .hero-grid{display:grid;grid-template-columns:1fr 460px;gap:60px;align-items:start}
+  @media (max-width:980px){.hero-grid{grid-template-columns:1fr;gap:48px}.hero{padding:48px 0 40px}}
+  .eyebrow-row{display:flex;align-items:center;gap:14px;margin-bottom:28px}
+  .live-dot{width:8px;height:8px;border-radius:99px;background:var(--accent);box-shadow:0 0 0 4px rgba(198,242,78,0.3);animation:pulse 1.6s infinite}
+  @keyframes pulse{0%,100%{box-shadow:0 0 0 4px rgba(198,242,78,0.3)}50%{box-shadow:0 0 0 8px rgba(198,242,78,0)}}
+
+  h1.hero-title{font-family:var(--display);font-weight:800;font-size:clamp(54px, 8vw, 110px);line-height:0.88;letter-spacing:-0.02em;text-transform:uppercase;margin-bottom:28px}
+  h1.hero-title em{font-style:normal;color:var(--brand)}
+  .hero-sub{font-family:var(--body);font-size:18px;color:var(--ink2);line-height:1.5;max-width:480px;margin-bottom:28px}
+  .hero-hook{font-family:var(--display);font-weight:700;font-size:clamp(20px,2.4vw,26px);line-height:1.05;letter-spacing:-0.01em;text-transform:uppercase;color:var(--ink);max-width:440px;margin-bottom:30px;border-left:4px solid var(--brand);padding-left:16px}
+
+  .badge-row{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:24px}
+  .store-badge{display:flex;align-items:center;gap:12px;padding:12px 20px;border-radius:14px;background:var(--ink);color:var(--bg);transition:transform .15s}
+  .store-badge:hover{transform:translateY(-2px)}
+  .store-badge .lbl{font-size:10px;font-weight:500;letter-spacing:0.04em;opacity:0.8}
+  .store-badge .name{font-family:var(--display);font-size:18px;font-weight:800;text-transform:uppercase;letter-spacing:-0.01em;line-height:1}
+  .store-badge svg{width:24px;height:24px;flex-shrink:0}
+
+  .signal-row{display:flex;gap:36px;margin-top:44px;padding-top:28px;border-top:1.5px solid var(--line);flex-wrap:wrap}
+  .signal{display:flex;flex-direction:column;gap:4px}
+  .signal .num{font-family:var(--display);font-weight:800;font-size:30px;letter-spacing:-0.01em;line-height:1;color:var(--ink)}
+  .signal .num em{font-style:normal;color:var(--brand)}
+  .signal .lbl{font-size:11px;color:var(--ink3);font-weight:600;letter-spacing:0.02em}
+
+  /* phones */
+  .phone-stage{position:relative;height:580px;display:flex;align-items:center;justify-content:center;margin-top:105px}
+  @media (max-width:980px){.phone-stage{height:auto;min-height:520px;margin-top:8px}}
+  .phone{width:280px;height:560px;border-radius:42px;background:var(--bg);overflow:hidden;position:absolute;box-shadow:0 30px 60px rgba(0,0,0,0.18), 0 0 0 1.5px rgba(0,0,0,0.18), inset 0 0 0 5px #0c0907;font-family:var(--body)}
+  .phone .notch{position:absolute;top:8px;left:50%;transform:translateX(-50%);width:90px;height:24px;border-radius:14px;background:#000;z-index:5}
+  .phone .status{display:flex;justify-content:space-between;padding:16px 28px 6px;font-family:-apple-system,Inter;font-size:12px;font-weight:600;color:var(--ink)}
+
+  .phone-back{transform:rotate(-6deg) translate(-100px, 30px) scale(0.95);opacity:0.92;filter:saturate(0.94)}
+  .phone-front{transform:rotate(2deg) translate(60px, -20px) scale(1.04);z-index:3}
+  .phone-mid{transform:rotate(-1deg) translateY(0);z-index:2}
+  @media (max-width:980px){
+    .phone-stage{transform:scale(0.85);transform-origin:center top}
+  }
+  @media (max-width:480px){
+    .phone-stage{transform:scale(0.7);height:440px}
+  }
+
+  /* phone screens */
+  .scr{padding:0 16px;color:var(--ink);height:calc(100% - 38px);overflow:hidden}
+  .scr h2{font-family:var(--display);font-weight:800;font-size:24px;letter-spacing:-0.01em;text-transform:uppercase;line-height:1;margin-bottom:6px}
+  .scr .label{font-size:9px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--ink3);margin-bottom:6px}
+  .stripes{background-image:repeating-linear-gradient(45deg, hsl(24,30%,80%) 0 4px, hsl(24,30%,74%) 4px 8px);border-radius:14px}
+  .stripes-2{background-image:repeating-linear-gradient(45deg, hsl(140,30%,75%) 0 4px, hsl(140,30%,69%) 4px 8px);border-radius:14px}
+  .stripes-3{background-image:repeating-linear-gradient(45deg, hsl(280,20%,75%) 0 4px, hsl(280,20%,69%) 4px 8px);border-radius:14px}
+
+  /* hero phone — Dashboard mini */
+  .dash-card{background:var(--ink);color:var(--bg);border-radius:24px;padding:18px;margin-top:8px}
+  .dash-card .meta{display:flex;justify-content:space-between;font-size:9px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:rgba(250,247,240,0.6);margin-bottom:8px}
+  .dash-card .countdown{font-family:var(--display);font-weight:800;font-size:46px;letter-spacing:-0.02em;line-height:0.9;margin-bottom:4px}
+  .dash-card .ev{font-size:11px;color:rgba(250,247,240,0.85);margin-top:6px}
+  .pill-going{display:inline-flex;align-items:center;padding:5px 9px;border-radius:99px;background:var(--accent);color:var(--ink);font-size:9px;font-weight:800;letter-spacing:0.08em;text-transform:uppercase}
+  .ev-row{display:flex;gap:10px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line)}
+  .ev-row:last-child{border-bottom:none}
+  .ev-thumb{width:42px;height:42px;border-radius:12px;flex-shrink:0}
+  .ev-info{flex:1;min-width:0}
+  .ev-info .t{font-family:var(--display);font-weight:800;font-size:14px;text-transform:uppercase;letter-spacing:-0.01em}
+  .ev-info .s{font-size:10px;color:var(--ink3)}
+  .pill-open{display:inline-flex;padding:4px 8px;border-radius:99px;background:var(--surface2);color:var(--ink);font-size:9px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;border:1px solid var(--line)}
+
+  /* phone screen — Groups mini */
+  .group-hero{text-align:center;padding:8px 0 12px}
+  .group-num{font-family:var(--display);font-weight:800;font-size:64px;letter-spacing:-0.04em;line-height:0.9;color:var(--ink)}
+  .group-sub{font-size:11px;color:var(--ink3);margin-top:4px}
+  .avatar-row{display:flex;justify-content:center;gap:-12px;margin-top:8px}
+  .avatar-row > div{width:40px;height:40px;border-radius:99px;border:2.5px solid var(--bg);margin-left:-10px}
+  .avatar-row > div:first-child{margin-left:0}
+
+  /* phone screen — Event mini */
+  .ev-hero{height:140px;background-image:repeating-linear-gradient(45deg, hsl(24,40%,75%) 0 5px, hsl(24,40%,68%) 5px 10px);border-radius:0 0 18px 18px;margin:-8px -16px 12px;display:flex;align-items:flex-end;padding:14px}
+  .pill-sport{display:inline-flex;align-items:center;padding:4px 9px;border-radius:99px;background:var(--accent);color:var(--ink);font-size:9px;font-weight:800;letter-spacing:0.08em;text-transform:uppercase;margin-right:5px}
+  .pill-imagery{display:inline-flex;padding:4px 9px;border-radius:99px;background:rgba(0,0,0,0.4);color:#fff;font-size:9px;font-weight:600;border:1px solid rgba(255,255,255,0.2)}
+
+  /* ============================================================
+     REAL APP SCREENS — recreated 1:1 from the Splinker source
+     (app/(tabs)/index.tsx, components/dashboard/*, app/event/[id]*,
+      groups.tsx, rate.tsx) using the app's own theme tokens.
+     ============================================================ */
+  .scr{font-family:var(--body)}
+
+  /* ---- Dashboard: greeting row (index.tsx greetingContainer) ---- */
+  .d-greet{display:flex;justify-content:space-between;align-items:flex-start;margin:2px 0 18px}
+  .d-date{font-family:var(--body);font-size:10px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--ink3);margin-bottom:6px}
+  .d-hi{font-family:var(--display);font-weight:800;font-size:34px;line-height:0.92;letter-spacing:-0.02em;text-transform:uppercase;color:var(--ink)}
+  .d-score{display:inline-flex;align-items:center;gap:6px;background:var(--brand);padding:8px 13px;border-radius:999px;flex-shrink:0;color:var(--brandInk)}
+  .d-score .st{font-size:13px;line-height:1}
+  .d-score .sn{font-family:var(--display);font-weight:800;font-size:17px;letter-spacing:-0.01em}
+  .d-score .sl{font-family:var(--body);font-size:9px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;opacity:0.8}
+
+  /* ---- Dashboard: MatchmakingCountdown (dark ink card) ---- */
+  .mm{background:var(--ink);color:var(--bg);border-radius:24px;padding:18px;margin-bottom:8px}
+  .mm-lbl{font-family:var(--body);font-size:10px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--bg);opacity:0.6;margin-bottom:6px}
+  .mm-ti{font-family:var(--display);font-weight:800;font-size:22px;letter-spacing:-0.02em;text-transform:uppercase;line-height:1.04;color:var(--bg);margin-bottom:16px}
+  .mm-tiles{display:flex;gap:8px}
+  .mm-tile{flex:1;background:rgba(255,255,255,0.1);border-radius:14px;padding:12px 0;text-align:center}
+  .mm-tile .v{font-family:var(--display);font-weight:800;font-size:24px;letter-spacing:-0.02em;line-height:1;color:var(--bg)}
+  .mm-tile .l{font-family:var(--body);font-size:8px;font-weight:700;letter-spacing:0.13em;text-transform:uppercase;color:var(--bg);opacity:0.6;margin-top:4px}
+
+  /* ---- Dashboard: section header (trendingHeader) ---- */
+  .d-sec{font-family:var(--display);font-weight:800;font-size:22px;letter-spacing:-0.02em;text-transform:uppercase;color:var(--ink);margin:18px 0 12px}
+
+  /* ---- Dashboard: CalendarStrip (letter / number / month + dot) ---- */
+  .cal{display:flex;gap:7px;overflow:hidden}
+  .cal-c{flex:0 0 auto;width:43px;padding:10px 0;border-radius:16px;background:var(--surface);border:1px solid var(--line);text-align:center}
+  .cal-c.on{background:var(--brand);border-color:var(--brand)}
+  .cal-c .cl{font-family:var(--body);font-size:10px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--ink);opacity:0.55}
+  .cal-c.on .cl{color:var(--brandInk);opacity:0.85}
+  .cal-c .cn{font-family:var(--display);font-weight:800;font-size:18px;letter-spacing:-0.02em;color:var(--ink);margin-top:2px;line-height:1.1}
+  .cal-c.on .cn{color:var(--brandInk)}
+  .cal-c .cm{font-family:var(--body);font-size:9px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--ink);opacity:0.55;margin-top:2px}
+  .cal-c.on .cm{color:var(--brandInk);opacity:0.85}
+  .cal-c .cd{width:4px;height:4px;border-radius:99px;margin:5px auto 0;background:var(--brand)}
+  .cal-c .cd.none{background:transparent}
+  .cal-c.on .cd{background:var(--brandInk)}
+
+  /* ---- Dashboard: EventListCard (horizontal) ---- */
+  .elc{display:flex;gap:11px;background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:11px;margin-top:10px}
+  .elc-img{width:66px;height:66px;border-radius:6px;flex-shrink:0;background:var(--surface2);background-size:cover;background-position:center}
+  .elc-body{flex:1;min-width:0}
+  .elc-top{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:6px}
+  .elc-org{font-family:var(--body);font-size:9px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--ink3);margin-bottom:2px}
+  .elc-ti{font-family:var(--display);font-weight:800;font-size:17px;line-height:1.05;letter-spacing:-0.02em;text-transform:uppercase;color:var(--ink)}
+  .elc-tag{flex-shrink:0;padding:4px 9px;border-radius:10px;font-family:var(--body);font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:-0.01em}
+  .elc-tag.going{background:var(--accent);color:var(--ink)}
+  .elc-tag.open{background:var(--ink);color:var(--bg)}
+  .elc-meta{display:flex;align-items:center;gap:5px;margin-top:2px;font-family:var(--body);font-size:12px;color:var(--ink2)}
+  .elc-meta svg{width:12px;height:12px;color:var(--ink3);flex-shrink:0}
+  .elc-pills{display:flex;gap:6px;margin-top:7px;flex-wrap:wrap}
+  .elc-pill{display:inline-flex;align-items:center;gap:4px;padding:4px 9px;border-radius:10px;background:var(--surface);border:1px solid var(--line);font-family:var(--body);font-size:11px;color:var(--ink2)}
+
+  /* ---- Event detail (app/event/[id].tsx) ---- */
+  .ed-top{position:absolute;top:14px;left:12px;right:12px;display:flex;justify-content:space-between;z-index:6}
+  .ed-btn{width:34px;height:34px;border-radius:99px;background:rgba(255,255,255,0.92);border:1px solid var(--line);display:flex;align-items:center;justify-content:center}
+  .ed-btn svg{width:16px;height:16px;color:var(--ink)}
+  .ed-img{height:150px;border-radius:16px;margin:6px 0 0;background:linear-gradient(135deg,#caa07a 0%,#a8714a 45%,#7c5a3c 100%);position:relative;overflow:hidden}
+  .ed-img::after{content:"";position:absolute;inset:0;background:radial-gradient(circle at 70% 25%, rgba(255,255,255,0.25), transparent 55%)}
+  .ed-club{font-family:var(--body);font-size:10px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--ink3);margin:14px 0 6px}
+  .ed-title{font-family:var(--display);font-weight:800;font-size:30px;line-height:0.92;letter-spacing:-0.02em;text-transform:uppercase;color:var(--ink);margin-bottom:14px}
+  .ed-pills{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:18px}
+  .ed-pill{padding:5px 10px;border-radius:10px;font-family:var(--body);font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:-0.01em;display:inline-flex;gap:4px;align-items:center}
+  .ed-pill.sport{background:var(--accent);color:var(--ink)}
+  .ed-pill.diff{background:var(--surface2);color:var(--ink2)}
+  .ed-meta{display:flex;align-items:flex-start;gap:14px;margin-bottom:16px}
+  .ed-meta .lab{font-family:var(--body);font-size:10px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--ink3);margin-bottom:5px}
+  .ed-meta .val{font-family:var(--display);font-weight:800;font-size:17px;letter-spacing:-0.02em;text-transform:uppercase;color:var(--ink)}
+  .ed-meta .sub{font-family:var(--body);font-size:12px;color:var(--ink3);margin-top:2px}
+  .ed-meta .vd{width:1px;height:34px;background:var(--line);flex-shrink:0}
+  .ed-map{height:96px;border-radius:14px;border:1px solid var(--line);overflow:hidden;position:relative;
+    background-color:#E8E2D4;
+    background-image:repeating-linear-gradient(0deg, transparent 0 19px, var(--line) 19px 20px),repeating-linear-gradient(90deg, transparent 0 19px, var(--line) 19px 20px)}
+  .ed-map svg{position:absolute;inset:0;width:100%;height:100%}
+  .ed-join{width:100%;display:flex;justify-content:space-between;align-items:center;background:var(--brand);color:var(--brandInk);border-radius:999px;padding:13px 18px;margin-top:14px;font-family:var(--display);font-weight:800;font-size:16px;text-transform:uppercase;letter-spacing:0.02em}
+  .ed-join svg{width:14px;height:14px}
+  .ed-sub{font-family:var(--body);font-size:11px;color:var(--ink3);text-align:center;margin-top:8px}
+  .ed-sub b{color:var(--ink)}
+
+  /* ---- Groups / matchmaking reveal (app/event/[id]/groups.tsx) ---- */
+  .gr-ticket{background:var(--ink);color:var(--bg);border-radius:24px;padding:18px}
+  .gr-ti{font-family:var(--display);font-weight:800;font-size:24px;letter-spacing:-0.02em;text-transform:uppercase;line-height:1;color:var(--bg);margin-bottom:14px}
+  .gr-row{display:flex;align-items:flex-start;gap:14px;border-top:1px solid rgba(255,255,255,0.15);padding-top:14px}
+  .gr-col{flex:1}
+  .gr-eye{font-family:var(--body);font-size:10px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;margin-bottom:10px}
+  .gr-eye.br{color:var(--brand)}
+  .gr-eye.dim{color:var(--bg);opacity:0.5;margin-bottom:6px}
+  .gr-stack{display:flex;align-items:center}
+  .gr-stack .a{width:32px;height:32px;border-radius:99px;border:2px solid var(--ink);margin-left:-10px}
+  .gr-stack .a:first-child{margin-left:0}
+  .gr-vd{width:1px;height:38px;background:rgba(255,255,255,0.15);flex-shrink:0}
+  .gr-count{font-family:var(--display);font-weight:800;font-size:22px;letter-spacing:-0.02em;color:var(--bg);margin-top:2px}
+  .gr-glance{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:14px 16px;margin-top:14px}
+  .gr-stats{display:flex}
+  .gr-stat{flex:1}
+  .gr-stat .l{font-family:var(--body);font-size:10px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--ink3);margin-bottom:5px}
+  .gr-stat .v{font-family:var(--display);font-weight:800;font-size:24px;letter-spacing:-0.02em;line-height:1;color:var(--ink)}
+  .gr-svd{width:1px;background:var(--line);margin:0 4px}
+  .gr-hd{height:1px;background:var(--line);margin:14px 0}
+  .gr-chips{display:flex;gap:7px;flex-wrap:wrap;margin-top:4px}
+  .gr-chip{display:inline-flex;align-items:center;gap:5px;padding:5px 9px;border-radius:10px;border:1.5px solid var(--line);background:var(--surface);font-family:var(--body);font-size:12px;color:var(--ink2)}
+  .gr-chip.all{background:var(--accent);border-color:var(--accent);color:var(--ink)}
+  .gr-chip .b{padding:1px 6px;border-radius:99px;font-size:9px;font-weight:700;letter-spacing:0.04em;background:var(--surface2);color:var(--ink3)}
+  .gr-chip.all .b{background:rgba(20,17,14,0.18);color:var(--ink)}
+  .gr-sec{font-family:var(--display);font-weight:800;font-size:20px;letter-spacing:-0.02em;text-transform:uppercase;color:var(--ink);margin:16px 0 10px}
+  .gr-mem{display:flex;align-items:center;gap:12px;background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:12px;margin-top:8px}
+  .gr-mem.you{background:var(--brand);border-color:var(--brand)}
+  .gr-mem .av{width:48px;height:48px;border-radius:99px;border:2.5px solid var(--surface2);flex-shrink:0}
+  .gr-mem.you .av{border-color:var(--ink)}
+  .gr-mem .info{flex:1;min-width:0}
+  .gr-mem .nm{font-family:var(--display);font-weight:800;font-size:18px;letter-spacing:-0.02em;text-transform:uppercase;color:var(--ink);display:flex;align-items:baseline;gap:5px}
+  .gr-mem.you .nm{color:var(--brandInk)}
+  .gr-mem .ag{font-family:var(--body);font-size:12px;font-weight:500;opacity:0.65}
+  .gr-mem .youb{font-family:var(--body);font-size:9px;font-weight:700;letter-spacing:0.08em;opacity:0.7}
+  .gr-mem .vibe{display:inline-flex;align-items:center;gap:4px;margin-top:5px;padding:3px 8px;border-radius:8px;border:1px solid var(--line);background:var(--surface);font-family:var(--body);font-size:11px;color:var(--ink2)}
+  .gr-mem.you .vibe{background:rgba(255,255,255,0.18);border-color:rgba(255,255,255,0.35);color:var(--brandInk)}
+  .gr-pill{flex-shrink:0;padding:3px 8px;border-radius:8px;border:1px solid var(--line);font-family:var(--body);font-size:11px;font-weight:600;text-transform:uppercase}
+  .gr-pill.on{background:var(--accent);border-color:var(--accent);color:var(--ink)}
+  .gr-pill.pend{background:var(--surface);color:var(--ink2)}
+
+  /* ---- Rate event (app/event/[id]/rate.tsx) ---- */
+  .rt-lbl{font-family:var(--body);font-size:10px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--ink3);margin-bottom:8px}
+  .rt-title{font-family:var(--display);font-weight:800;font-size:28px;line-height:0.92;letter-spacing:-0.02em;text-transform:uppercase;color:var(--ink);margin-bottom:18px}
+  .rt-card{display:flex;align-items:center;gap:12px;background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:14px}
+  .rt-card .img{width:54px;height:54px;border-radius:6px;flex-shrink:0;background:linear-gradient(135deg,#caa07a,#7c5a3c)}
+  .rt-card .nm{font-family:var(--display);font-weight:800;font-size:18px;letter-spacing:-0.02em;text-transform:uppercase;color:var(--ink)}
+  .rt-card .sb{font-family:var(--body);font-size:12px;color:var(--ink3);margin-top:2px}
+  .rt-stars{text-align:center;padding:18px 0 4px}
+  .rt-row{display:flex;gap:8px;justify-content:center;margin-bottom:8px}
+  .rt-row svg{width:32px;height:32px}
+  .rt-grade{font-family:var(--display);font-weight:800;font-size:24px;letter-spacing:-0.02em;text-transform:uppercase;color:var(--ink)}
+  .rt-tags{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+  .rt-tag{padding:5px 10px;border-radius:10px;border:1.5px solid var(--line);background:var(--surface);font-family:var(--body);font-size:13px;font-weight:500;color:var(--ink2)}
+  .rt-tag.on{border-color:var(--brand);background:var(--brand);color:var(--brandInk);font-weight:700}
+  .rt-mem{display:flex;align-items:center;gap:12px;background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:8px 12px;margin-top:8px}
+  .rt-mem.on{border:2px solid var(--ink);padding:7px 11px}
+  .rt-mem .av{width:46px;height:46px;border-radius:99px;flex-shrink:0;border:2px solid var(--surface)}
+  .rt-mem .nm{flex:1;font-family:var(--display);font-weight:800;font-size:16px;letter-spacing:-0.02em;text-transform:uppercase;color:var(--ink)}
+  .rt-mem .sel{width:22px;height:22px;border-radius:99px;border:2px solid var(--line);flex-shrink:0;display:flex;align-items:center;justify-content:center}
+  .rt-mem.on .sel{border-color:var(--brand)}
+  .rt-mem.on .sel::after{content:"";width:10px;height:10px;border-radius:99px;background:var(--brand)}
+  .rt-submit{width:100%;text-align:center;background:var(--brand);color:var(--brandInk);border-radius:999px;padding:14px;margin-top:16px;font-family:var(--display);font-weight:800;font-size:16px;text-transform:uppercase;letter-spacing:0.02em}
+
+  /* sport ticker */
+  .ticker-mask{margin-top:60px;overflow:hidden;border-top:1.5px solid var(--line);border-bottom:1.5px solid var(--line);padding:18px 0;position:relative}
+  .ticker{display:flex;animation:scroll 32s linear infinite;white-space:nowrap;will-change:transform}
+  .ticker-item{display:inline-flex;align-items:center;gap:10px;margin-right:48px;font-family:var(--display);font-weight:700;font-size:24px;text-transform:uppercase;letter-spacing:-0.01em;color:var(--ink)}
+  .ticker-item .dot{width:6px;height:6px;border-radius:99px;background:var(--brand)}
+  .ticker-item .em{font-size:24px}
+  @keyframes scroll{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+
+  /* ===== SECTION HEADER ===== */
+  .section{padding:96px 0;position:relative}
+  @media (max-width:720px){.section{padding:64px 0}}
+  .section-eyebrow-row{display:flex;align-items:center;gap:12px;margin-bottom:28px}
+  .section-eyebrow-row .num{font-family:var(--mono);font-size:11px;font-weight:600;letter-spacing:0.2em;color:var(--ink3)}
+  .section-eyebrow-row .line{flex:1;height:1.5px;background:var(--line)}
+  h2.section-title{font-family:var(--display);font-weight:800;font-size:clamp(40px, 6vw, 72px);line-height:0.92;letter-spacing:-0.02em;text-transform:uppercase;max-width:900px;margin-bottom:24px}
+  h2.section-title em{font-style:normal;color:var(--brand)}
+  .section-sub{font-size:17px;color:var(--ink2);max-width:560px;line-height:1.5;margin-bottom:48px}
+
+  /* ===== HOW IT WORKS ===== */
+  .steps{display:grid;grid-template-columns:repeat(4,1fr);gap:18px}
+  @media (max-width:980px){.steps{grid-template-columns:repeat(2,1fr);gap:16px}}
+  @media (max-width:560px){.steps{grid-template-columns:1fr}}
+  .step{padding:28px;border-radius:28px;background:var(--surface);border:1.5px solid var(--line);position:relative;overflow:hidden;transition:transform .25s, box-shadow .25s, border-color .25s}
+  .step:hover{transform:translateY(-4px);box-shadow:0 14px 40px rgba(0,0,0,0.06);border-color:var(--brand)}
+  .step .step-num{font-family:var(--display);font-weight:800;font-size:74px;letter-spacing:-0.03em;color:var(--surface2);line-height:0.85;margin-bottom:-6px;transition:color .25s}
+  .step:hover .step-num{color:var(--brand)}
+  .step .step-emoji{font-size:32px;line-height:1;margin-bottom:14px;display:inline-block}
+  .step h3{font-family:var(--display);font-weight:800;font-size:28px;letter-spacing:-0.01em;text-transform:uppercase;line-height:1;margin-bottom:10px}
+  .step p{font-size:14px;color:var(--ink2);line-height:1.5}
+
+  /* ===== CHILL ZONE band ===== */
+  .chill{background:var(--ink);color:var(--bg);border-radius:36px;padding:56px;position:relative;overflow:hidden}
+  @media (max-width:720px){.chill{padding:36px 28px;border-radius:28px}}
+  .chill-grid{display:grid;grid-template-columns:1.1fr 1fr;gap:48px;align-items:center;position:relative;z-index:2}
+  @media (max-width:880px){.chill-grid{grid-template-columns:1fr;gap:32px}}
+  .chill .eyebrow{display:inline-flex;align-items:center;gap:10px;font-family:var(--body);font-size:11px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--accent);margin-bottom:20px}
+  .chill .eyebrow .d{width:7px;height:7px;border-radius:99px;background:var(--accent)}
+  .chill h3{font-family:var(--display);font-weight:800;font-size:clamp(36px,5vw,60px);line-height:0.9;letter-spacing:-0.02em;text-transform:uppercase;margin-bottom:20px}
+  .chill h3 em{font-style:normal;color:var(--accent)}
+  .chill p{font-size:16px;line-height:1.55;color:rgba(250,247,240,0.82);max-width:440px;margin-bottom:14px}
+  .chill .deco{position:absolute;top:-80px;right:-80px;width:380px;height:380px;border-radius:50%;border:1.5px solid rgba(198,242,78,0.18);z-index:1}
+  .chill .deco::before{content:"";position:absolute;inset:50px;border-radius:50%;border:1.5px solid rgba(198,242,78,0.12)}
+  .chill .deco::after{content:"";position:absolute;inset:110px;border-radius:50%;border:1.5px solid rgba(198,242,78,0.08)}
+  /* the "drop" notification mock */
+  .drop{background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.14);border-radius:22px;padding:20px;backdrop-filter:blur(8px)}
+  .drop-head{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+  .drop-ic{width:34px;height:34px;border-radius:9px;background:linear-gradient(135deg,#FF8A4A,#EE4A23);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:18px}
+  .drop-app{font-family:var(--body);font-size:12px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:rgba(250,247,240,0.6)}
+  .drop-time{margin-left:auto;font-family:var(--mono);font-size:11px;color:rgba(250,247,240,0.5)}
+  .drop-title{font-family:var(--display);font-weight:800;font-size:22px;letter-spacing:-0.01em;text-transform:uppercase;line-height:1;margin-bottom:8px}
+  .drop-body{font-size:14px;line-height:1.45;color:rgba(250,247,240,0.85)}
+  .drop-body b{color:var(--accent)}
+  .chill-stats{display:flex;gap:28px;margin-top:24px;padding-top:22px;border-top:1px solid rgba(255,255,255,0.14)}
+  .chill-stats .v{font-family:var(--display);font-weight:800;font-size:26px;letter-spacing:-0.01em;line-height:1;color:var(--accent)}
+  .chill-stats .l{font-size:11px;color:rgba(250,247,240,0.6);font-weight:600;margin-top:3px}
+
+  /* ===== FOR EVERYONE (split) ===== */
+  .split{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  @media (max-width:880px){.split{grid-template-columns:1fr}}
+  .panel{padding:40px;border-radius:32px;position:relative;overflow:hidden;min-height:380px;display:flex;flex-direction:column;justify-content:space-between}
+  .panel-people{background:var(--ink);color:var(--bg)}
+  .panel-people .micro{color:rgba(250,247,240,0.6)}
+  .panel-partners{background:var(--brand);color:var(--brandInk)}
+  .panel-partners .micro{color:rgba(255,255,255,0.7)}
+  .panel h3{font-family:var(--display);font-weight:800;font-size:48px;line-height:0.92;letter-spacing:-0.02em;text-transform:uppercase;margin:18px 0 14px}
+  .panel p{font-size:15px;line-height:1.5;margin-bottom:28px;opacity:0.9}
+  .panel-link{display:inline-flex;align-items:center;gap:10px;padding:14px 22px;border-radius:99px;font-family:var(--display);font-weight:800;font-size:14px;text-transform:uppercase;letter-spacing:0.04em;transition:transform .15s}
+  .panel-link:hover{transform:translateY(-2px)}
+  .panel-people .panel-link{background:var(--accent);color:var(--ink)}
+  .panel-partners .panel-link{background:var(--brandInk);color:var(--brand)}
+  .panel-stats{display:flex;gap:32px;margin-top:24px;padding-top:24px;border-top:1px solid currentColor;border-color:rgba(255,255,255,0.18)}
+  .panel-stats .v{font-family:var(--display);font-weight:800;font-size:32px;letter-spacing:-0.01em;line-height:1}
+  .panel-stats .l{font-size:11px;font-weight:600;opacity:0.8;margin-top:2px}
+
+  /* corner decorations */
+  .deco-confetti{position:absolute;top:0;right:0;width:200px;height:200px;pointer-events:none;opacity:0.18}
+
+  /* ===== SCREEN TOUR ===== */
+  .tour{display:grid;grid-template-columns:380px 1fr;gap:60px;align-items:center}
+  @media (max-width:980px){.tour{grid-template-columns:1fr;gap:40px}}
+  .tour-phones{position:relative;height:600px;display:flex;justify-content:center;align-items:center}
+  @media (max-width:980px){.tour-phones{height:auto;padding:20px 0}}
+  .tour .phone{position:relative;transform:none;box-shadow:0 30px 60px rgba(0,0,0,0.14), 0 0 0 1.5px rgba(0,0,0,0.18), inset 0 0 0 5px #0c0907}
+  .tour-tabs{display:flex;flex-direction:column;gap:6px}
+  .tour-tab{display:flex;align-items:flex-start;gap:14px;padding:18px 20px;border-radius:18px;border:1.5px solid transparent;text-align:left;width:100%;transition:all .2s;color:var(--ink)}
+  .tour-tab:hover{background:var(--surface)}
+  .tour-tab.active{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+  .tour-tab .num{font-family:var(--mono);font-size:11px;font-weight:600;color:var(--ink3);letter-spacing:0.1em;padding-top:3px;width:24px}
+  .tour-tab.active .num{color:rgba(250,247,240,0.55)}
+  .tour-tab .info h4{font-family:var(--display);font-weight:800;font-size:22px;letter-spacing:-0.01em;text-transform:uppercase;line-height:1;margin-bottom:5px}
+  .tour-tab .info p{font-size:13px;line-height:1.45;color:var(--ink3);transition:color .2s}
+  .tour-tab.active .info p{color:rgba(250,247,240,0.7)}
+
+  /* ===== FINAL CTA ===== */
+  .final{padding:120px 0;text-align:center;position:relative;overflow:hidden}
+  @media (max-width:720px){.final{padding:80px 0}}
+  .final-bg{position:absolute;inset:0;pointer-events:none;z-index:0}
+  .final h2{position:relative;z-index:1;font-family:var(--display);font-weight:800;font-size:clamp(56px, 9vw, 130px);line-height:0.88;letter-spacing:-0.02em;text-transform:uppercase;margin-bottom:32px}
+  .final h2 em{font-style:normal;color:var(--brand)}
+  .final .badge-row{justify-content:center;position:relative;z-index:1}
+
+  /* ===== FOOTER ===== */
+  footer{background:var(--ink);color:var(--bg);padding:64px 0 40px}
+  .foot-row{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:40px;margin-bottom:48px}
+  @media (max-width:720px){.foot-row{grid-template-columns:1fr 1fr;gap:32px}}
+  footer .logo{color:var(--bg);margin-bottom:16px}
+  footer .logo-mark{background:linear-gradient(135deg,#FF8A4A,#EE4A23);color:var(--brandInk)}
+  footer p{font-size:13px;color:rgba(250,247,240,0.6);max-width:300px;line-height:1.5}
+  .foot-col h5{font-family:var(--display);font-weight:800;font-size:13px;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:14px;color:rgba(250,247,240,0.6)}
+  .foot-col a{display:block;font-size:14px;color:var(--bg);margin-bottom:8px;transition:color .15s}
+  .foot-col a:hover{color:var(--brand)}
+  .foot-bot{display:flex;justify-content:space-between;align-items:center;padding-top:24px;border-top:1px solid rgba(255,255,255,0.1);font-size:12px;color:rgba(250,247,240,0.5);flex-wrap:wrap;gap:14px}
+
+  /* utilities */
+  @media (max-width:720px){.hide-mobile{display:none}}
+
+  /* ===== Embedded real app screens (iframes of the standalone screen files) ===== */
+  /* Wrapper clips to the device (390x844). The iframe is made WIDER than the
+     device (460) so the standalone page's flexbox body doesn't shrink the
+     phone; we then offset the iframe so the device sits flush in the wrapper. */
+  .phoneEmbed{position:absolute;width:390px;height:844px;border-radius:54px;overflow:hidden;clip-path:inset(0 round 54px);box-shadow:0 26px 55px rgba(0,0,0,0.22)}
+  .phoneEmbed iframe{position:absolute;top:-40px;left:-35px;width:460px;height:884px;border:0;display:block}
+  /* Hero fan — centered, then offset + rotated. transform-origin center. */
+  .phone-stage .phoneEmbed{top:50%;left:50%;margin:-422px 0 0 -195px;transform-origin:center}
+  .pe-back{transform:translate(-232px,34px) rotate(-6deg) scale(0.60);opacity:0.96;z-index:1}
+  .pe-mid{transform:rotate(-1deg) scale(0.62);z-index:2}
+  .pe-front{transform:translate(232px,-18px) rotate(2deg) scale(0.64);z-index:3}
+  .tour-phones{overflow:hidden}
+  /* Mirror the hero phones exactly: absolutely-positioned + a translate in the
+     transform, which forces Chrome to composite-and-clip the iframe to the
+     rounded frame. A plain scale() (relative positioning) did not. */
+  .pe-tour{top:50%;left:50%;margin:-422px 0 0 -195px;transform:scale(0.62) translateZ(0);transform-origin:center}
+  @media (max-width:980px){.phone-stage .phoneEmbed{margin:-380px 0 0 -195px}}
+  /* ===== language switcher ===== */
+  .nav-right{display:flex;align-items:center;gap:14px}
+  .lang-switch{display:inline-flex;align-items:center;border:1.5px solid var(--line);border-radius:999px;padding:3px;gap:2px;background:var(--surface)}
+  .lang-switch button{font-family:var(--display);font-weight:800;font-size:12px;letter-spacing:0.06em;text-transform:uppercase;padding:5px 11px;border-radius:999px;color:var(--ink3);line-height:1;cursor:pointer;transition:background .15s,color .15s}
+  .lang-switch button.active{background:var(--ink);color:var(--bg)}
+</style>
+</head>
+<body>
+
+<!-- ===== NAV ===== -->
+<nav>
+  <div class="nav-row">
+    <div class="logo">
+      <span class="logo-mark"><img src="assets/splinker-icon.png" alt="Splinker"></span>
+      <span class="splinker">Spl<span class="i">&#x131;</span>nker</span>
+    </div>
+    <div class="nav-links">
+      <a href="#how" data-t="nav.how">How it works</a>
+      <a href="#tour" data-t="nav.tour">App tour</a>
+      <a href="#partners" data-t="nav.partners">For partners</a>
+      <a href="#download" data-t="nav.download">Download</a>
+    </div>
+    <div class="nav-right">
+      <div class="lang-switch" id="lang-switch">
+        <button type="button" data-lang="en">EN</button>
+        <button type="button" data-lang="hu">HU</button>
+      </div>
+      <a href="#download" class="nav-cta" data-t="nav.cta">Get the app</a>
+    </div>
+  </div>
+</nav>
+
+<!-- ===== HERO ===== -->
+<header class="hero">
+  <div class="wrap">
+    <div class="hero-grid">
+      <div>
+        <div class="eyebrow-row">
+          <span class="live-dot"></span>
+          <span class="micro" data-t="hero.eyebrow">Running in Budapest · More sports & cities coming</span>
+        </div>
+        <h1 class="hero-title" data-t="hero.title">Find your sport,<br/>find your <em>people.</em></h1>
+        <p class="hero-hook" data-t="hero.hook">Showing up alone is the hardest part. So we took it out.</p>
+        <p class="hero-sub" data-t="hero.sub">Splinker drops you into a group of 3–5 locals who match your pace and vibe, then picks the place to bring every group together after. No DMs, no organizing, no showing up alone.</p>
+        <div class="badge-row">
+          <a href="#" class="store-badge" aria-label="Download on the App Store">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.05 20.28c-.98.95-2.05.8-3.08.36-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.36C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z"/></svg>
+            <div><div class="lbl" data-t="badge.dl1">Download on the</div><div class="name">App Store</div></div>
+          </a>
+          <a href="#" class="store-badge" aria-label="Get it on Google Play">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M3.609 1.814L13.792 12 3.61 22.186a.996.996 0 01-.61-.92V2.734a1 1 0 01.609-.92zm10.89 10.893l2.302 2.302-10.937 6.333 8.635-8.635zm3.199-3.198l2.807 1.626a1 1 0 010 1.73l-2.808 1.626L15.046 12l2.652-2.491zM5.864 1.483L16.802 7.816 14.5 10.118 5.864 1.483z"/></svg>
+            <div><div class="lbl" data-t="badge.dl2">Get it on</div><div class="name">Google Play</div></div>
+          </a>
+        </div>
+
+      </div>
+
+      <!-- phones -->
+      <div class="phone-stage" aria-hidden="true">
+        <div class="phoneEmbed pe-back"><iframe src="GroupReveal.html" title="Group reveal" scrolling="no"></iframe></div>
+        <div class="phoneEmbed pe-mid"><iframe src="Dashboard.html" title="Dashboard" scrolling="no"></iframe></div>
+        <div class="phoneEmbed pe-front"><iframe src="EventDetail.html" title="Event detail" scrolling="no"></iframe></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- sport ticker -->
+  <div class="ticker-mask">
+    <div class="ticker" id="ticker">
+      <!-- duplicated for seamless loop -->
+    </div>
+  </div>
+</header>
+
+<!-- ===== HOW IT WORKS ===== -->
+<section class="section" id="how">
+  <div class="wrap">
+    <div class="section-eyebrow-row">
+      <span class="num">01</span>
+      <span class="micro" data-t="how.eyebrow">How it works</span>
+      <span class="line"></span>
+    </div>
+    <h2 class="section-title" data-t="how.title">Three taps to your<br/><em>next regular crew.</em></h2>
+    <p class="section-sub" data-t="how.sub">No swiping, no group chats with 200 strangers. Splinker does the matching, you just show up.</p>
+
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">01</div>
+        <div class="step-emoji">🏃</div>
+        <h3 data-t="how.s1h">Pick an event</h3>
+        <p data-t="how.s1p">Splinker auto-creates events across the city's most popular spots — each with a level, a pace, and a vibe. Find one that fits and tap to join.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">02</div>
+        <div class="step-emoji">🤝</div>
+        <h3 data-t="how.s2h">Get matched</h3>
+        <p data-t="how.s2p">2 hours before the start, we sort everyone into small groups of 3–5 by level and personality. You'll meet 2–4 people who actually fit you — not the whole roster.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">03</div>
+        <div class="step-emoji">☕</div>
+        <h3 data-t="how.s3h">Hit the chill zone</h3>
+        <p data-t="how.s3p">Meet at the spot and have fun together. Then head to the chill zone, where every group from the session comes together.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">04</div>
+        <div class="step-emoji">🔁</div>
+        <h3 data-t="how.s4h">Rate & repeat</h3>
+        <p data-t="how.s4p">Rate the session and mark who you'd meet again. We'll match you with similar people next time.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== APP TOUR (interactive) ===== -->
+<section class="section" id="tour" style="background:#FFFDF8">
+  <div class="wrap">
+    <div class="section-eyebrow-row">
+      <span class="num">02</span>
+      <span class="micro" data-t="tour.eyebrow">App tour</span>
+      <span class="line"></span>
+    </div>
+    <h2 class="section-title" data-t="tour.title">Built for the moment <em>before, during,</em> and after.</h2>
+
+    <div class="tour">
+      <div class="tour-phones">
+        <div class="phoneEmbed pe-tour"><iframe id="tour-frame" src="Dashboard.html" title="Splinker app" scrolling="no"></iframe></div>
+      </div>
+
+      <div class="tour-tabs" id="tour-tabs">
+        <button class="tour-tab active" data-tab="dash">
+          <span class="num">01</span>
+          <div class="info">
+            <h4 data-t="tour.dh">Dashboard</h4>
+            <p data-t="tour.dp">Your next session, front and center — and the countdown that makes you show up.</p>
+          </div>
+        </button>
+        <button class="tour-tab" data-tab="event">
+          <span class="num">02</span>
+          <div class="info">
+            <h4 data-t="tour.eh">Event detail</h4>
+            <p data-t="tour.ep">Everything you need to say yes. Nothing you don't.</p>
+          </div>
+        </button>
+        <button class="tour-tab" data-tab="groups">
+          <span class="num">03</span>
+          <div class="info">
+            <h4 data-t="tour.gh">Group reveal</h4>
+            <p data-t="tour.gp">The moment it gets real: meet the 2–4 people you're about to click with.</p>
+          </div>
+        </button>
+        <button class="tour-tab" data-tab="rate">
+          <span class="num">04</span>
+          <div class="info">
+            <h4 data-t="tour.rh">Rate the session</h4>
+            <p data-t="tour.rp">Tell us how it went. Your next group gets better every time.</p>
+          </div>
+        </button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== USERS + PARTNERS SPLIT ===== -->
+<section class="section" id="partners">
+  <div class="wrap">
+    <div class="section-eyebrow-row">
+      <span class="num">03</span>
+      <span class="micro" data-t="pt.eyebrow">For everyone</span>
+      <span class="line"></span>
+    </div>
+    <h2 class="section-title" data-t="pt.title">People show up.<br/>Clubs <em>fill up.</em></h2>
+    <p class="section-sub" data-t="pt.sub">Splinker is two products in one: a way for people to find their crew, and a way for clubs to put empty slots in front of the right new faces.</p>
+
+    <div class="split">
+      <div class="panel panel-people">
+        <div>
+          <span class="micro" data-t="pt.p1m">Free to join</span>
+          <h3 data-t="pt.p1h">Stop searching.<br/>Start showing up.</h3>
+          <p data-t="pt.p1p">Pick the sessions you like, set your level, get matched. The hardest part of any meetup — walking in alone — is already handled.</p>
+        </div>
+        <div>
+          <a href="#download" class="panel-link" data-t="pt.p1l">Get the app →</a>
+        </div>
+      </div>
+
+      <div class="panel panel-partners">
+        <svg class="deco-confetti" viewBox="0 0 200 200" aria-hidden="true">
+          <circle cx="100" cy="100" r="60" stroke="white" stroke-opacity="0.3" stroke-width="1.5" fill="none"/>
+          <circle cx="100" cy="100" r="90" stroke="white" stroke-opacity="0.2" stroke-width="1.5" fill="none"/>
+          <circle cx="100" cy="100" r="120" stroke="white" stroke-opacity="0.12" stroke-width="1.5" fill="none"/>
+        </svg>
+        <div>
+          <span class="micro" data-t="pt.p2m">Clubs & organizers</span>
+          <h3 data-t="pt.p2h">Got an event?<br/>We'll fill it.</h3>
+          <p data-t="pt.p2p">List your events on Splinker and we'll send you new people who match your level and vibe — already warmed up by the group format, more likely to come back.</p>
+        </div>
+        <div>
+          <a href="mailto:partners@splinker.hu" class="panel-link" data-t="pt.p2l">List your event →</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== FINAL CTA ===== -->
+<section class="final" id="download">
+  <svg class="final-bg" viewBox="0 0 1200 600" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+    <defs>
+      <pattern id="dots" width="40" height="40" patternUnits="userSpaceOnUse">
+        <circle cx="20" cy="20" r="1.5" fill="var(--ink)" opacity="0.15"/>
+      </pattern>
+    </defs>
+    <rect width="1200" height="600" fill="url(#dots)"/>
+  </svg>
+  <div class="wrap">
+    <h2 data-t="final.title">Sport is<br/>better with<br/><em>people.</em></h2>
+    <div class="badge-row">
+      <a href="#" class="store-badge">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.05 20.28c-.98.95-2.05.8-3.08.36-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.36C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z"/></svg>
+        <div><div class="lbl" data-t="badge.dl1">Download on the</div><div class="name">App Store</div></div>
+      </a>
+      <a href="#" class="store-badge">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M3.609 1.814L13.792 12 3.61 22.186a.996.996 0 01-.61-.92V2.734a1 1 0 01.609-.92zm10.89 10.893l2.302 2.302-10.937 6.333 8.635-8.635zm3.199-3.198l2.807 1.626a1 1 0 010 1.73l-2.808 1.626L15.046 12l2.652-2.491zM5.864 1.483L16.802 7.816 14.5 10.118 5.864 1.483z"/></svg>
+        <div><div class="lbl" data-t="badge.dl2">Get it on</div><div class="name">Google Play</div></div>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ===== FOOTER ===== -->
+<footer>
+  <div class="wrap">
+    <div class="foot-row">
+      <div>
+        <div class="logo"><span class="logo-mark"><img src="assets/splinker-icon.png" alt="Splinker"></span><span class="splinker">Spl<span class="i">&#x131;</span>nker</span></div>
+        <p data-t="ft.tag">Built in Budapest.</p>
+      </div>
+      <div class="foot-col">
+        <h5 data-t="ft.product">Product</h5>
+        <a href="#how" data-t="nav.how">How it works</a>
+        <a href="#download" data-t="nav.download">Download</a>
+      </div>
+      <div class="foot-col">
+        <h5 data-t="ft.contact">Contact</h5>
+        <a href="mailto:partners@splinker.hu" data-t="ft.listevent">List your event</a>
+        <a href="mailto:partners@splinker.hu" data-t="ft.chillzone">Become a chillzone partner</a>
+      </div>
+      <div class="foot-col">
+        <h5 data-t="ft.company">Splinker</h5>
+        <a href="https://splinker-app.github.io/legal-docs/privacy-policy.html" target="_blank" rel="noopener" data-t="ft.privacy">Privacy</a>
+        <a href="https://splinker-app.github.io/legal-docs/terms-of-service.html" target="_blank" rel="noopener" data-t="ft.terms">Terms</a>
+      </div>
+    </div>
+    <div class="foot-bot">
+      <div data-t="ft.bot">© 2026 Splinker</div>
+    </div>
+  </div>
+</footer>
+
+<!-- ===== JS ===== -->
+<script>
+  /* ----- Sport ticker (clone for seamless loop) ----- */
+  (function(){
+    const t = document.getElementById('ticker');
+    const sports = [
+      ['🙌','Show up'],['🤝','Get matched'],['👥','Small groups'],['☕','Chill zone'],
+      ['🚫','No DMs'],['📊','Your level'],['🔁','Meet new people'],['🫂','Come alone, leave with people']
+    ];
+    const set = sports.map(([e,s]) =>
+      `<span class="ticker-item"><span class="em">${e}</span><span>${s}</span><span class="dot"></span></span>`
+    ).join('');
+    t.innerHTML = set + set + set + set; // repeat for seamless loop
+  })();
+
+  /* ----- App tour — swap the embedded screen on tab click ----- */
+  (function(){
+    const frame = document.getElementById('tour-frame');
+    const tabs = document.querySelectorAll('#tour-tabs .tour-tab');
+    const srcs = { dash:'Dashboard.html', event:'EventDetail.html', groups:'GroupReveal.html', rate:'RateEvent.html' };
+    let active = 'dash';
+    function show(k){
+      if (frame.getAttribute('data-screen') !== k){ frame.src = srcs[k]; frame.setAttribute('data-screen', k); }
+      tabs.forEach(t => t.classList.toggle('active', t.dataset.tab === k));
+      active = k;
+    }
+    tabs.forEach(t => t.addEventListener('click', () => show(t.dataset.tab)));
+    show('dash');
+    const order = ['dash','event','groups','rate'];
+    let timer = setInterval(() => { active = order[(order.indexOf(active)+1)%order.length]; show(active); }, 4500);
+    document.querySelector('#tour').addEventListener('mouseenter', () => clearInterval(timer));
+  })();
+
+  /* ----- Language switcher EN / HU ----- */
+  const I18N = {
+    "nav.how":      {en:"How it works?", hu:"Hogyan működik?"},
+    "nav.tour":     {en:"App tour", hu:"Az alkalmazás"},
+    "nav.partners": {en:"For partners", hu:"Partnereknek"},
+    "nav.chill":    {en:"Chill zone", hu:"Chill zone"},
+    "nav.download": {en:"Download", hu:"Letöltés"},
+    "nav.cta":      {en:"Get the app", hu:"Töltsd le"},
+    "hero.eyebrow": {en:"Running in Budapest · More sports & cities coming", hu:"Futás Budapesten · Hamarosan több sport és város"},
+    "hero.title":   {en:"Find your sport,<br>find your <em>people.</em>", hu:"Találd meg a sportod,<br>találd meg a <em>csapatod.</em>"},
+    "hero.hook":    {en:"Showing up alone is the hardest part. So we took it out.", hu:"Egyedül megjelenni a legnehezebb. Ezért kivettük a képletből."},
+    "hero.sub":     {en:"Splinker drops you into a group of 3–5 locals who match your pace and vibe, then picks the place to bring every group together after. No DMs, no organizing, no showing up alone.", hu:"A Splinker egy 3–5 fős csapatokba sorsol, akik passzolnak a tempódhoz és a hangulatodhoz, majd kiválasztja a helyet ahol a csapatokat összehozza egymással. Nincs üzengetés, nincs szervezés, nincs egyedül megjelenés."},
+    "badge.dl1":    {en:"Download on the", hu:"Letölthető az"},
+    "badge.dl2":    {en:"Get it on", hu:"Elérhető a"},
+    "how.eyebrow":  {en:"How it works", hu:"Hogyan működik"},
+    "how.title":    {en:"Three taps to your<br><em>next regular crew.</em>", hu:"Három kattintás az<br><em>új állandó csapatodhoz.</em>"},
+    "how.sub":      {en:"No swiping, no group chats with 200 strangers. Splinker does the matching, you just show up.", hu:"Nincs lapozgatás, nincs 200 idegennel teli csoportchat. A Splinker párosít, neked csak el kell jönnöd."},
+    "how.s1h":      {en:"Pick an event", hu:"Válassz egy eseményt"},
+    "how.s1p":      {en:"Splinker auto-creates events across the city's most popular spots — each with a level, a pace, and a vibe. Find one that fits and tap to join.", hu:"A Splinker automatikusan eseményeket hoz létre a város legnépszerűbb helyein — mind saját szinttel, tempóval és hangulattal. Találd meg, ami passzol, és csatlakozz egy kattintással."},
+    "how.s2h":      {en:"Get matched", hu:"Párosítás"},
+    "how.s2p":      {en:"2 hours before the start, we sort everyone into small groups of 3–5 by level and personality. You'll meet 2–4 people who actually fit you — not the whole roster.", hu:"2 órával a kezdés előtt mindenkit 3–5 fős kis csoportokba sorsolunk szint és személyiség alapján. 2–4 emberrel találkozol, akik tényleg passzolnak hozzád — nem az egész névsorral."},
+    "how.s3h":      {en:"Hit the chill zone", hu:"Irány a chill zone"},
+    "how.s3p":      {en:"Meet at the spot and have fun together. Then head to the chill zone, where every group from the session comes together.", hu:"Találkozzatok a helyszínen és érezzétek jól magatokat. Utána irány a chill zone, ahol az esemény minden csapata összejön."},
+    "how.s4h":      {en:"Rate & repeat", hu:"Értékelj és ismételd"},
+    "how.s4p":      {en:"Rate the session and mark who you'd meet again. We'll match you with similar people next time.", hu:"Értékeld az eseményt és jelöld meg, kivel találkoznál újra. Legközelebb hasonló emberekkel párosítunk."},
+    "chill.eyebrow":{en:"The chill zone", hu:"A chill zone"},
+    "chill.title":  {en:"The run ends.<br>The <em>hangout</em> begins.", hu:"A futás véget ér.<br>A <em>lazulás</em> kezdődik."},
+    "chill.p1":     {en:"A run with strangers is nice. A reason to stick around is better. 20 minutes in, Splinker drops the name of a nearby café or bar — and every group from that run heads to the same place.", hu:"Egy futás idegenekkel kellemes. Egy ok, amiért ott maradsz, még jobb. 20 perccel a start után a Splinker elküldi egy közeli kávézó vagy bár nevét — és a futás minden csoportja ugyanoda tart."},
+    "chill.p2":     {en:"Eight groups, one spot. It's where 30 people who came alone leave with people they'll run with again.", hu:"Nyolc csoport, egy hely. Itt 30 ember, aki egyedül jött, olyanokkal megy el, akikkel újra futni fog."},
+    "chill.v1":     {en:"+20 min", hu:"+20 perc"},
+    "chill.l1":     {en:"drop after start", hu:"értesítés a start után"},
+    "chill.v2":     {en:"1 spot", hu:"1 hely"},
+    "chill.l2":     {en:"all groups, together", hu:"minden csoport együtt"},
+    "chill.now":    {en:"now", hu:"most"},
+    "chill.dtitle": {en:"Chill zone is open", hu:"A chill zone nyitva"},
+    "chill.dbody":  {en:"Head to <b>Léo Café</b> on Pozsonyi út when you finish. Your group and 7 others will be there. First round's on you 😉", hu:"A futás után irány a <b>Léo Café</b> a Pozsonyi úton. A csapatod és további 7 ott lesz. Az első kör a tiéd 😉"},
+    "tour.eyebrow": {en:"App tour", hu:"Az alkalmazás"},
+    "tour.title":   {en:"Built for the moment <em>before, during,</em> and after.", hu:"A pillanatra tervezve: <em>előtte, közben</em> és utána."},
+    "tour.dh":      {en:"Dashboard", hu:"Főképernyő"},
+    "tour.dp":      {en:"Your next session, front and center — and the countdown that makes you show up.", hu:"A következő alkalmad a középpontban — és a visszaszámlálás, amitől tényleg ott leszel."},
+    "tour.eh":      {en:"Event detail", hu:"Esemény részletei"},
+    "tour.ep":      {en:"Everything you need to say yes. Nothing you don't.", hu:"Minden info amire szükséged van, hogy igent mondj. Semmi felesleges."},
+    "tour.gh":      {en:"Group reveal", hu:"Csoport felfedése"},
+    "tour.gp":      {en:"The moment it gets real: meet the 2–4 people you're about to click with.", hu:"Az igazság pillanata: ismerd meg azt a 2–4 embert, akikkel egy húron fogtok pendülni."},
+    "tour.rh":      {en:"Rate the session", hu:"Értékeld az alkalmat"},
+    "tour.rp":      {en:"Tell us how it went. Your next group gets better every time.", hu:"Mondd el, milyen volt. A következő csapatod minden alkalommal jobb lesz."},
+    "pt.eyebrow":   {en:"For everyone", hu:"Mindenkinek"},
+    "pt.title":     {en:"People show up.<br>Clubs <em>fill up.</em>", hu:"Az emberek megjelennek.<br>A klubok <em>megtelnek.</em>"},
+    "pt.sub":       {en:"Splinker is two products in one: a way for people to find their crew, and a way for clubs to put empty slots in front of the right new faces.", hu:"A Splinker két termék egyben: az embereknek mód megtalálni a csapatukat, a kluboknak pedig mód az üres helyeket a megfelelő új arcok elé tenni."},
+    "pt.p1m":       {en:"Free to join", hu:"Ingyenes"},
+    "pt.p1h":       {en:"Stop searching.<br>Start showing up.", hu:"Ne keresgélj.<br>Csak gyere el."},
+    "pt.p1p":       {en:"Pick the sessions you like, set your level, get matched. The hardest part of any meetup — walking in alone — is already handled.", hu:"Válaszd ki a neked tetsző eseményt, állítsd be a szinted, és párosítunk. A legnehezebb rész — egyedül eljönni — már megoldva."},
+    "pt.p1l":       {en:"Get the app →", hu:"Töltsd le az appot →"},
+    "pt.p2m":       {en:"Clubs & organizers", hu:"Klubok és szervezők"},
+    "pt.p2h":       {en:"Got an event?<br>We'll fill it.", hu:"Van egy eseményed?<br>Megtöltjük."},
+    "pt.p2p":       {en:"List your events on Splinker and we'll send you new people who match your level and vibe — already warmed up by the group format, more likely to come back.", hu:"Hirdesd meg az eseményeidet a Splinkeren, mi pedig új embereket küldünk, akik passzolnak a szintedhez és a hangulatodhoz — a csoportos formátum már bemelegítette őket, nagyobb eséllyel térnek vissza."},
+    "pt.p2l":       {en:"List your event →", hu:"Hirdesd meg az eseményed →"},
+    "final.title":  {en:"Sport is<br>better with<br><em>people.</em>", hu:"A sport<br>jobb<br><em>emberekkel.</em>"},
+    "ft.tag":       {en:"Built in Budapest.", hu:"Budapesten készült."},
+    "ft.product":   {en:"Product", hu:"Termék"},
+    "ft.contact":   {en:"Contact", hu:"Kapcsolat"},
+    "ft.listevent": {en:"List your event", hu:"Hirdesd meg az eseményed"},
+    "ft.chillzone": {en:"Become a chillzone partner", hu:"Legyél chillzone partner"},
+    "ft.company":   {en:"Splinker", hu:"Splinker"},
+    "ft.privacy":   {en:"Privacy", hu:"Adatvédelem"},
+    "ft.terms":     {en:"Terms", hu:"Feltételek"},
+    "ft.bot":       {en:"© 2026 Splinker", hu:"© 2026 Splinker"}
+  };
+  const TICKER = {
+    en:[['🙌','Show up'],['🤝','Get matched'],['👥','Small groups'],['☕','Chill zone'],['🚫','No DMs'],['📊','Your level'],['🔁','Meet new people'],['🫂','Come alone, leave with people']],
+    hu:[['🙌','Jelenj meg'],['🤝','Párosítunk'],['👥','Kis csapatok'],['☕','Chill zone'],['🚫','Nincs üzengetés'],['📊','A te szinted'],['🔁','Találkozz új emberekkel'],['🫂','Egyedül jössz, csapattal mész']]
+  };
+  function buildTicker(lang){
+    const t=document.getElementById('ticker'); if(!t) return;
+    const set=(TICKER[lang]||TICKER.en).map(([e,x])=>`<span class="ticker-item"><span class="em">${e}</span><span>${x}</span><span class="dot"></span></span>`).join('');
+    t.innerHTML=set+set+set+set;
+  }
+  function setLang(lang){
+    if(lang!=='hu') lang='en';
+    document.querySelectorAll('[data-t]').forEach(el=>{ const v=I18N[el.getAttribute('data-t')]; if(v&&v[lang]!=null) el.innerHTML=v[lang]; });
+    document.documentElement.lang=lang;
+    try{localStorage.setItem('splinker-lang',lang);}catch(e){}
+    document.querySelectorAll('#lang-switch button').forEach(b=>b.classList.toggle('active', b.dataset.lang===lang));
+    buildTicker(lang);
+  }
+  (function(){
+    let saved=null; try{saved=localStorage.getItem('splinker-lang');}catch(e){}
+    document.querySelectorAll('#lang-switch button').forEach(b=>b.addEventListener('click',()=>setLang(b.dataset.lang)));
+    setLang(saved==='hu'?'hu':'en');
+  })();
+</script>
+
+</body>
+</html>
