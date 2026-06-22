@@ -44,12 +44,48 @@
   .nav-links a:hover{color:var(--brand)}
   .nav-cta{padding:10px 18px;border-radius:999px;background:var(--ink);color:var(--bg);font-family:var(--display);font-size:14px;font-weight:800;text-transform:uppercase;letter-spacing:0.04em;transition:transform .15s,background .15s}
   .nav-cta:hover{background:var(--brand);color:var(--brandInk);transform:translateY(-1px)}
-  @media (max-width:720px){.nav-links{display:none}}
+  /* ===== Hamburger (mobile only) ===== */
+  .nav-toggle{display:none;width:42px;height:42px;border:1px solid var(--line);border-radius:12px;background:rgba(255,253,248,0.6);cursor:pointer;padding:0;flex-direction:column;align-items:center;justify-content:center;gap:5px}
+  .nav-toggle span{display:block;width:20px;height:2px;background:var(--ink);border-radius:2px;transition:transform .25s ease,opacity .2s ease}
+  .nav-toggle.open span:nth-child(1){transform:translateY(7px) rotate(45deg)}
+  .nav-toggle.open span:nth-child(2){opacity:0}
+  .nav-toggle.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
+  .mobile-menu{display:none;flex-direction:column;max-height:0;overflow:hidden;background:rgba(255,253,248,0.97);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);transition:max-height .3s ease}
+  .mobile-menu>a{padding:15px 24px;font-family:var(--display);font-weight:700;font-size:16px;text-transform:uppercase;letter-spacing:0.02em;color:var(--ink);border-top:1px solid var(--line);text-align:right}
+  .mobile-menu>a:active{color:var(--brand)}
+  .mobile-menu-foot{display:flex;flex-direction:column;gap:14px;padding:18px 24px;border-top:1px solid var(--line)}
+  .mobile-menu-foot .lang-switch{align-self:flex-end}
+  .mobile-cta{display:block;text-align:center;width:100%;padding:14px 18px;font-size:15px}
+  @media (max-width:720px){
+    .nav-links{display:none}
+    .nav-right .lang-switch,.nav-right .nav-cta{display:none}
+    .nav-toggle{display:flex}
+    .mobile-menu{display:flex}
+    .mobile-menu.show{max-height:460px;border-top:1px solid var(--line)}
+    /* iOS Safari: a fixed element with backdrop-filter forces the whole page off
+       the GPU fast-path and makes animations (the ticker) stutter. Drop the blur
+       on mobile and use a near-opaque background instead. */
+    nav{backdrop-filter:none;-webkit-backdrop-filter:none;background:rgba(255,253,248,0.98)}
+    .mobile-menu{backdrop-filter:none;-webkit-backdrop-filter:none;background:rgba(255,253,248,0.99)}
+    /* Hide the scrolling sport ticker on phones */
+    .ticker-mask{display:none}
+  }
 
   /* ===== HERO ===== */
   .hero{padding:80px 0 60px;position:relative;overflow:hidden}
   .hero-grid{display:grid;grid-template-columns:1fr 460px;gap:60px;align-items:start}
   @media (max-width:980px){.hero-grid{grid-template-columns:1fr;gap:48px}.hero{padding:48px 0 40px}}
+  /* Mobile: drop the 3 phone displays between the hook and the "Splinker drops..." copy */
+  @media (max-width:980px){
+    .hero-copy{display:contents}
+    .hero-grid{row-gap:0}
+    .eyebrow-row{order:1}
+    .hero-title{order:2}
+    .hero-hook{order:3}
+    .phone-stage{order:4;margin-bottom:-40px}
+    .hero-sub{order:5}
+    .badge-row{order:6}
+  }
   .eyebrow-row{display:flex;align-items:center;gap:14px;margin-bottom:28px}
   .live-dot{width:8px;height:8px;border-radius:99px;background:var(--accent);box-shadow:0 0 0 4px rgba(198,242,78,0.3);animation:pulse 1.6s infinite}
   @keyframes pulse{0%,100%{box-shadow:0 0 0 4px rgba(198,242,78,0.3)}50%{box-shadow:0 0 0 8px rgba(198,242,78,0)}}
@@ -273,15 +309,17 @@
 
   /* sport ticker */
   .ticker-mask{margin-top:60px;overflow:hidden;border-top:1.5px solid var(--line);border-bottom:1.5px solid var(--line);padding:18px 0;position:relative}
-  .ticker{display:flex;animation:scroll 32s linear infinite;white-space:nowrap;will-change:transform}
+  .ticker{display:flex;animation:scroll 32s linear infinite;white-space:nowrap;will-change:transform;transform:translateZ(0);backface-visibility:hidden}
   .ticker-item{display:inline-flex;align-items:center;gap:10px;margin-right:48px;font-family:var(--display);font-weight:700;font-size:24px;text-transform:uppercase;letter-spacing:-0.01em;color:var(--ink)}
   .ticker-item .dot{width:6px;height:6px;border-radius:99px;background:var(--brand)}
   .ticker-item .em{font-size:24px}
-  @keyframes scroll{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+  @keyframes scroll{from{transform:translate3d(0,0,0)}to{transform:translate3d(-50%,0,0)}}
 
   /* ===== SECTION HEADER ===== */
   .section{padding:96px 0;position:relative}
   @media (max-width:720px){.section{padding:64px 0}}
+  /* Phone: pull the "How it works" section up toward the store buttons (ticker is hidden here) */
+  @media (max-width:720px){.hero{padding-bottom:10px}#how{padding-top:26px;padding-bottom:10px}#tour{padding-top:50px;padding-bottom:10px}#partners{padding-top:50px}}
   .section-eyebrow-row{display:flex;align-items:center;gap:12px;margin-bottom:28px}
   .section-eyebrow-row .num{font-family:var(--mono);font-size:11px;font-weight:600;letter-spacing:0.2em;color:var(--ink3)}
   .section-eyebrow-row .line{flex:1;height:1.5px;background:var(--line)}
@@ -352,7 +390,32 @@
   .tour{display:grid;grid-template-columns:380px 1fr;gap:60px;align-items:center}
   @media (max-width:980px){.tour{grid-template-columns:1fr;gap:40px}}
   .tour-phones{position:relative;height:600px;display:flex;justify-content:center;align-items:center}
-  @media (max-width:980px){.tour-phones{height:auto;padding:20px 0}}
+  @media (max-width:980px){.tour-phones{height:540px;padding:0}}
+  /* ===== Mobile App-tour swipe carousel ===== */
+  .tour-swipe-wrap{display:none;position:relative}
+  .tcar-arrow{display:none}
+  @media (max-width:980px){
+    .tour{display:none}
+    .tour-swipe-wrap{display:block}
+    .tour-swipe{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+    .tour-swipe::-webkit-scrollbar{display:none}
+    .tswipe-slide{flex:0 0 100%;scroll-snap-align:center;display:flex;flex-direction:column;align-items:center}
+    .tswipe-slide .tour-phones{width:100%}
+    .tswipe-info{text-align:center;max-width:340px;margin:4px auto 0;padding:0 16px}
+    .tswipe-info .tnum{font-family:var(--mono);font-size:11px;font-weight:600;letter-spacing:0.2em;color:var(--ink3);display:block;margin-bottom:8px}
+    .tswipe-info h4{font-family:var(--display);font-weight:800;font-size:22px;letter-spacing:-0.01em;text-transform:uppercase;line-height:1;margin-bottom:8px}
+    .tswipe-info p{font-size:14px;line-height:1.5;color:var(--ink3)}
+    .tour-dots{display:flex;justify-content:center;gap:8px;margin-top:20px}
+    .tour-dots span{width:7px;height:7px;border-radius:99px;background:var(--line);cursor:pointer;transition:background .2s,width .2s}
+    .tour-dots span.on{background:var(--brand);width:22px}
+    /* prev/next arrows beside the phone — no circle, pushed outward */
+    .tcar-arrow{display:flex;align-items:center;justify-content:center;position:absolute;top:270px;transform:translateY(-50%);width:32px;height:44px;background:transparent;border:0;box-shadow:none;color:var(--ink);z-index:6;cursor:pointer;padding:0}
+    .tcar-arrow svg{width:26px;height:26px;display:block}
+    .tcar-arrow.prev{left:-14px}
+    .tcar-arrow.next{right:-14px}
+    .tcar-arrow:active{color:var(--brand)}
+    .tcar-arrow[disabled]{opacity:0.25;pointer-events:none}
+  }
   .tour .phone{position:relative;transform:none;box-shadow:0 30px 60px rgba(0,0,0,0.14), 0 0 0 1.5px rgba(0,0,0,0.18), inset 0 0 0 5px #0c0907}
   .tour-tabs{display:flex;flex-direction:column;gap:6px}
   .tour-tab{display:flex;align-items:flex-start;gap:14px;padding:18px 20px;border-radius:18px;border:1.5px solid transparent;text-align:left;width:100%;transition:all .2s;color:var(--ink)}
@@ -432,6 +495,22 @@
         <button type="button" data-lang="hu">HU</button>
       </div>
       <a href="#download" class="nav-cta" data-t="nav.cta">Get the app</a>
+      <button type="button" class="nav-toggle" id="nav-toggle" aria-label="Menu" aria-expanded="false" aria-controls="mobile-menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+  <div class="mobile-menu" id="mobile-menu">
+    <a href="#how" data-t="nav.how">How it works</a>
+    <a href="#tour" data-t="nav.tour">App tour</a>
+    <a href="#partners" data-t="nav.partners">For partners</a>
+    <a href="#download" data-t="nav.download">Download</a>
+    <div class="mobile-menu-foot">
+      <div class="lang-switch" aria-label="Language">
+        <button type="button" data-lang="en">EN</button>
+        <button type="button" data-lang="hu">HU</button>
+      </div>
+      <a href="#download" class="nav-cta mobile-cta" data-t="nav.cta">Get the app</a>
     </div>
   </div>
 </nav>
@@ -440,7 +519,7 @@
 <header class="hero">
   <div class="wrap">
     <div class="hero-grid">
-      <div>
+      <div class="hero-copy">
         <div class="eyebrow-row">
           <span class="live-dot"></span>
           <span class="micro" data-t="hero.eyebrow">Running in Budapest · More sports & cities coming</span>
@@ -530,7 +609,7 @@
 
     <div class="tour">
       <div class="tour-phones">
-        <div class="phoneEmbed pe-tour"><iframe id="tour-frame" src="Dashboard.html" title="Splinker app" scrolling="no"></iframe></div>
+        <div class="phoneEmbed pe-tour"><iframe id="tour-frame" src="Dashboard.html" title="Splinker app" scrolling="no" loading="lazy"></iframe></div>
       </div>
 
       <div class="tour-tabs" id="tour-tabs">
@@ -563,6 +642,31 @@
           </div>
         </button>
       </div>
+    </div>
+
+    <!-- Mobile swipe carousel: live screen + its description, swipes in from the right -->
+    <div class="tour-swipe-wrap">
+      <div class="tour-swipe" id="tour-track">
+        <div class="tswipe-slide">
+          <div class="tour-phones"><div class="phoneEmbed pe-tour"><iframe data-src="Dashboard.html" title="Dashboard" scrolling="no"></iframe></div></div>
+          <div class="tswipe-info"><span class="tnum">01</span><h4 data-t="tour.dh">Dashboard</h4><p data-t="tour.dp">Your next session, front and center — and the countdown that makes you show up.</p></div>
+        </div>
+        <div class="tswipe-slide">
+          <div class="tour-phones"><div class="phoneEmbed pe-tour"><iframe data-src="EventDetail.html" title="Event detail" scrolling="no"></iframe></div></div>
+          <div class="tswipe-info"><span class="tnum">02</span><h4 data-t="tour.eh">Event detail</h4><p data-t="tour.ep">Everything you need to say yes. Nothing you don't.</p></div>
+        </div>
+        <div class="tswipe-slide">
+          <div class="tour-phones"><div class="phoneEmbed pe-tour"><iframe data-src="GroupReveal.html" title="Group reveal" scrolling="no"></iframe></div></div>
+          <div class="tswipe-info"><span class="tnum">03</span><h4 data-t="tour.gh">Group reveal</h4><p data-t="tour.gp">The moment it gets real: meet the 2–4 people you're about to click with.</p></div>
+        </div>
+        <div class="tswipe-slide">
+          <div class="tour-phones"><div class="phoneEmbed pe-tour"><iframe data-src="RateEvent.html" title="Rate the session" scrolling="no"></iframe></div></div>
+          <div class="tswipe-info"><span class="tnum">04</span><h4 data-t="tour.rh">Rate the session</h4><p data-t="tour.rp">Tell us how it went. Your next group gets better every time.</p></div>
+        </div>
+      </div>
+      <button type="button" class="tcar-arrow prev" id="tcar-prev" aria-label="Previous screen"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg></button>
+      <button type="button" class="tcar-arrow next" id="tcar-next" aria-label="Next screen"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg></button>
+      <div class="tour-dots" id="tour-dots"><span class="on"></span><span></span><span></span><span></span></div>
     </div>
   </div>
 </section>
@@ -705,7 +809,7 @@
     "nav.chill":    {en:"Chill zone", hu:"Chill zone"},
     "nav.download": {en:"Download", hu:"Letöltés"},
     "nav.cta":      {en:"Get the app", hu:"Töltsd le"},
-    "hero.eyebrow": {en:"Running in Budapest · More sports & cities coming", hu:"Futás Budapesten · Hamarosan több sport és város"},
+    "hero.eyebrow": {en:"Running in Budapest · More sports & cities coming", hu:"Egyelőre Budapesten · Hamarosan több sport és város"},
     "hero.title":   {en:"Find your sport,<br>find your <em>people.</em>", hu:"Találd meg a sportod,<br>találd meg a <em>csapatod.</em>"},
     "hero.hook":    {en:"Showing up alone is the hardest part. So we took it out.", hu:"Egyedül megjelenni a legnehezebb. Ezért kivettük a képletből."},
     "hero.sub":     {en:"Splinker drops you into a group of 3–5 locals who match your pace and vibe, then picks the place to bring every group together after. No DMs, no organizing, no showing up alone.", hu:"A Splinker egy 3–5 fős csapatokba sorsol, akik passzolnak a tempódhoz és a hangulatodhoz, majd kiválasztja a helyet ahol a csapatokat összehozza egymással. Nincs üzengetés, nincs szervezés, nincs egyedül megjelenés."},
@@ -779,13 +883,87 @@
     document.querySelectorAll('[data-t]').forEach(el=>{ const v=I18N[el.getAttribute('data-t')]; if(v&&v[lang]!=null) el.innerHTML=v[lang]; });
     document.documentElement.lang=lang;
     try{localStorage.setItem('splinker-lang',lang);}catch(e){}
-    document.querySelectorAll('#lang-switch button').forEach(b=>b.classList.toggle('active', b.dataset.lang===lang));
+    document.querySelectorAll('.lang-switch button').forEach(b=>b.classList.toggle('active', b.dataset.lang===lang));
     buildTicker(lang);
   }
   (function(){
     let saved=null; try{saved=localStorage.getItem('splinker-lang');}catch(e){}
-    document.querySelectorAll('#lang-switch button').forEach(b=>b.addEventListener('click',()=>setLang(b.dataset.lang)));
+    document.querySelectorAll('.lang-switch button').forEach(b=>b.addEventListener('click',()=>setLang(b.dataset.lang)));
     setLang(saved==='hu'?'hu':'en');
+  })();
+
+  /* ----- App-tour swipe carousel (mobile): lazy-mount screens, sync dots (manual swipe only) ----- */
+  (function(){
+    const track=document.getElementById('tour-track');
+    if(!track) return;
+    const real=Array.prototype.slice.call(track.querySelectorAll('.tswipe-slide'));
+    const dots=Array.prototype.slice.call(document.querySelectorAll('#tour-dots span'));
+    const prevBtn=document.getElementById('tcar-prev');
+    const nextBtn=document.getElementById('tcar-next');
+    const N=real.length;
+    if(!N) return;
+
+    /* clone last->front and first->end so the carousel loops seamlessly */
+    const cFirst=real[0].cloneNode(true), cLast=real[N-1].cloneNode(true);
+    cFirst.classList.add('tclone'); cLast.classList.add('tclone');
+    track.appendChild(cFirst);
+    track.insertBefore(cLast, real[0]);
+    const phys=Array.prototype.slice.call(track.querySelectorAll('.tswipe-slide')); /* [cLast, ...real, cFirst] */
+    const LAST=phys.length-1;
+
+    function W(){ return track.clientWidth; }
+    function logical(p){ if(p<=0) return N-1; if(p>=LAST) return 0; return p-1; }
+
+    /* lazy-mount each screen; rootMargin preloads neighbours so the wrap is seamless */
+    const io=new IntersectionObserver(function(entries){
+      entries.forEach(function(e){
+        if(!e.isIntersecting) return;
+        const f=e.target.querySelector('iframe[data-src]');
+        if(f){ f.src=f.getAttribute('data-src'); f.removeAttribute('data-src'); }
+      });
+    },{root:track,rootMargin:'0px 100% 0px 100%',threshold:0});
+    phys.forEach(function(s){ io.observe(s); });
+
+    function setDots(){ var lg=logical(Math.round(track.scrollLeft/W())); dots.forEach(function(d,j){ d.classList.toggle('on', j===lg); }); }
+    function snapStart(){ if(W()>0){ track.scrollLeft=1*W(); setDots(); } }
+    snapStart(); setTimeout(snapStart,60);
+
+    /* when a swipe/animation settles on a clone, jump instantly to the matching real slide */
+    var settleT=null;
+    track.addEventListener('scroll',function(){
+      setDots();
+      clearTimeout(settleT);
+      settleT=setTimeout(function(){
+        var p=Math.round(track.scrollLeft/W());
+        if(p<=0) track.scrollLeft=(LAST-1)*W();      /* front clone -> real last */
+        else if(p>=LAST) track.scrollLeft=1*W();      /* end clone  -> real first */
+        setDots();
+      },120);
+    },{passive:true});
+
+    /* arrows step (loop), dots jump */
+    function step(dir){ var p=Math.round(track.scrollLeft/W()); track.scrollTo({left:(p+dir)*W(), behavior:'smooth'}); }
+    if(prevBtn) prevBtn.addEventListener('click',function(){ step(-1); });
+    if(nextBtn) nextBtn.addEventListener('click',function(){ step(1); });
+    dots.forEach(function(d,i){ d.addEventListener('click',function(){ track.scrollTo({left:(i+1)*W(), behavior:'smooth'}); }); });
+
+    var rT=null;
+    window.addEventListener('resize',function(){ clearTimeout(rT); rT=setTimeout(function(){ track.scrollLeft=Math.round(track.scrollLeft/W())*W(); },150); });
+  })();
+
+  /* ----- Hamburger menu (mobile only) ----- */
+  (function(){
+    const btn=document.getElementById('nav-toggle');
+    const menu=document.getElementById('mobile-menu');
+    if(!btn||!menu) return;
+    function close(){ menu.classList.remove('show'); btn.classList.remove('open'); btn.setAttribute('aria-expanded','false'); }
+    btn.addEventListener('click',function(){
+      const open=menu.classList.toggle('show');
+      btn.classList.toggle('open',open);
+      btn.setAttribute('aria-expanded',open?'true':'false');
+    });
+    menu.querySelectorAll('a').forEach(a=>a.addEventListener('click',close));
+    window.addEventListener('resize',function(){ if(window.innerWidth>720) close(); });
   })();
 </script>
 
