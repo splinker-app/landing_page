@@ -335,6 +335,8 @@
   .step:hover{transform:translateY(-4px);box-shadow:0 14px 40px rgba(0,0,0,0.06);border-color:var(--brand)}
   .step .step-num{font-family:var(--display);font-weight:800;font-size:74px;letter-spacing:-0.03em;color:var(--surface2);line-height:0.85;margin-bottom:-6px;transition:color .25s}
   .step:hover .step-num{color:var(--brand)}
+  /* Touch devices can't hover, so show the step number orange by default */
+  @media (hover:none){ .step .step-num{color:var(--brand)} }
   .step .step-emoji{font-size:32px;line-height:1;margin-bottom:14px;display:inline-block}
   .step h3{font-family:var(--display);font-weight:800;font-size:28px;letter-spacing:-0.01em;text-transform:uppercase;line-height:1;margin-bottom:10px}
   .step p{font-size:14px;color:var(--ink2);line-height:1.5}
